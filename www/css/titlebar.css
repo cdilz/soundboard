@@ -4,7 +4,7 @@
 	display: flex;
 	color: rgb(180, 180, 180);
 	background-color: rgb(26, 34, 50);
-	height: 2rem;
+	height: 1.75rem;
 	-webkit-app-region: drag; 
 }
 
@@ -33,6 +33,16 @@
 .titlebar_button:hover
 {
 	background-color: rgb(54, 62, 78);
+}
+
+#titlebar_close:hover
+{
+	background-color: rgb(255, 0, 0);
+}
+
+#titlebar_close:hover path
+{
+	stroke: rgb(255, 255, 255);
 }
 
 .titlebar_button>svg
