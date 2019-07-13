@@ -8,6 +8,7 @@ const _directory = _path.dirname(process.execPath)
 const _settingsDirectory = _path.join(_directory, 'settings')
 const _audioSettingsDirectory = _path.join(_settingsDirectory, 'audio')
 const _audioDirectory = _path.join(_directory, 'audio')
+let _settings = []
 
 // Set up the settings and audio folders immediately
 _fs.mkdir(_audioSettingsDirectory, {recursive: true}, (err)=>{if(err){alert(err)}})
@@ -20,7 +21,7 @@ class Settings
 		this.fileName = fileName
 		this.options = {}
 		this.options.fileName = fileName
-		this.options.filepath = _path.join(_audioDirectory, fileName)
+		this.options.filePath = _path.join(_audioDirectory, fileName)
 		this.options.key = override.key || null
 		this.options.hold = override.hold || false
 		this.options.loop = override.loop || false
@@ -46,6 +47,9 @@ class Settings
 	{
 		try
 		{
+			// Check if there's a settings file for it
+			// 	If there is: create a Settings from that
+			//  If there isn't: create a new Settings from the filename
 			let path = _path.join(_audioSettingsDirectory, fileName + '.json')
 			if(_fs.existsSync(path))
 			{
@@ -71,12 +75,129 @@ class Settings
 			let path = _path.join(_audioSettingsDirectory, this.fileName + '.json')
 			let settings = JSON.stringify(this.options)
 			_fs.writeFileSync(path, settings, {encoding: 'utf8'})
+			return this
 		}
 		catch(e)
 		{
 			throw e
 		}
 	}
+
+	toHTML()
+	{
+		let titleHolder = document.createElement('p')
+		titleHolder.append(this.options.fileName)
+		let title = titleHolder.innerHTML
+		let filePath = this.options.filePath
+
+		let html =
+		`
+			<div class = 'soundContainer'>
+				<audio src='${filePath}'>
+				</audio>
+				<div class = 'soundTop'>
+					<div class = 'playButton'>
+					</div>
+					<div class = 'soundTitle'>
+						${title}
+					</div>
+				</div>
+				<div class = 'soundBottom'>
+				</div>
+			</div>
+		`
+		return html
+	}
+}
+
+// Sort the _settings array alphabetically by filename
+function _sortSettings()
+{
+	return _settings.sort((setA, setB) =>
+	{
+		const setAFN = setA.fileName.toLowerCase()
+		const setBFN = setB.fileName.toLowerCase()
+		if(setAFN < setBFN)
+		{
+			return -1
+		}
+		else if(setAFN > setBFN)
+		{
+			return 1
+		}
+		return 0
+	})
+}
+
+function _writeToDisplay()
+{
+	// Sort display here before writing
+	_sortSettings()
+
+	let display = document.querySelector('#display')
+	display.innerHTML = ''
+	for(let i = 0; i < _settings.length; i++)
+	{
+		display.innerHTML += _settings[i].toHTML()
+	}
+
+	let players = document.querySelectorAll('.soundContainer')
+	for(let i = 0; i < players.length; i++)
+	{
+		let player = players[i]
+		let audio = player.querySelector('audio')
+		let playButton = player.querySelector('.playButton')
+		playButton.addEventListener('click', (e) =>
+		{
+			if(audio.paused)
+			{
+				audio.play()
+			}
+			else
+			{
+				audio.pause()
+			}
+		})
+	}
+
+	/*
+	let player =  domParser.parseFromString(html, 'text/html')
+	let playButton = player.querySelector('.playButton')
+	let audio = player.querySelector('audio')
+	playButton.addEventListener('click', (e) =>
+	{
+		audio.play()
+	})
+
+	return player
+	*/
+}
+
+function _addFilesToSettings(files)
+{
+	for(let i = 0; i < files.length; i++)
+	{
+		let file = files[i]
+		let fileName = _path.basename(file)
+		try
+		{
+			let audioDirectory = _path.join(_audioDirectory, fileName)
+			// If the file doesn't already exist in _audioDirectory, copy file
+			if(file != audioDirectory)
+			{
+				_fs.copyFileSync(file, audioDirectory)
+			}
+			// If file is copied or already exists then we should load the settings and then save it to initialize it if it's new
+			let setting = Settings.load(fileName).save()
+			_settings.push(setting)
+		}
+		catch(e)
+		{
+			alert(e)
+		}
+	}
+	// Write the newly added settings to the display
+	_writeToDisplay()
 }
 
 document.addEventListener('DOMContentLoaded', () =>
@@ -146,22 +267,19 @@ document.addEventListener('DOMContentLoaded', () =>
 		
 			if(files)
 			{
-				for(let i = 0; i < files.length; i++)
-				{
-					let file = files[i]
-					let fileName = _path.basename(file)
-					try
-					{
-						a = _fs.copyFileSync(file, _path.join(_audioDirectory, fileName))
-						// If file is copied then we should save it to the settings area and initialize it in the display
-						Settings.load(fileName).save()
-					}
-					catch(e)
-					{
-						alert(e)
-					}
-				}
+				_addFilesToSettings(files)
 			}
 		
+	})
+
+	_fs.readdir(_audioDirectory, (err, files) =>
+	{
+		let audioFiles = []
+		for(let i = 0; i < files.length; i++)
+		{
+			audioFiles.push(_path.join(_audioDirectory, files[i]))
+		}
+
+		_addFilesToSettings(audioFiles)
 	})
 })

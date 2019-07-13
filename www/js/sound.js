@@ -17,7 +17,6 @@ function parseJSON(input)
 	}
 }
 
-
 class Sound
 {
 	/*
@@ -64,7 +63,7 @@ class Sound
 		this.settings.modifier.alt = input.modifier.alt || false
 		this.settings.modifier.ctrl = input.modifier.ctrl || false
 		this.settings.modifier.shift = input.modifier.shift || false
-		//This is the menu key on windows, not sure on Mac
+		//This is the menu key on windows, not sure on Linux and Mac
 		this.settings.modifier.meta = input.modifier.meta || false
 
 		this.settings.constrain = {}

@@ -3,11 +3,12 @@
 	- [x] Maximize
 	- [x] Restore
 	- [x] Close
-	- [ ] Add files/folders
+	- [X] Add files/folders (multiple files works, can't do both files AND folders)
 	- [ ] Settings?
 
 - [ ] Audio container
 	- [ ] Delete Button
+	- [ ] Play Speed Modifier
 	- [ ] Play/Pause Button
 		- [ ] Create SVG Play Icon
 		- [ ] Create SVG Pause Icon
@@ -25,7 +26,8 @@
 		- [ ] Create icon for looping, perhaps an infinity with an arrow in it
 	- [ ] Button to indicate that this will force restart instead of paused (when key pressed again or let go in hold or pause button pressed)
 		- [ ] Create icon for restart, perhaps a sideways U-turn symbol would work here?
-	- [ ] Volume control
+	- [ ] Volume Control
+		- [ ] Mute Button
 	- [ ] Seek Slider
 		- [ ] Click anywhere to seek
 		- [ ] Bars on both end to limit the seeks

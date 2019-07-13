@@ -5,6 +5,7 @@
     <title>Soundboard</title>
     <link rel="stylesheet" href="./css/main.css">
     <link rel="stylesheet" href="./css/titlebar.css">
+    <link rel="stylesheet" href="./css/sound.css">
   </head>
   <body>
     <header id='titlebar'>
@@ -40,14 +41,8 @@
         </svg>
       </div>
     </header>
-
-
-
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
-
+    <div id='display'>
+    </div>
     <!-- You can also require other files to run in this process -->
     <script src="./js/renderer.js"></script>
     <script>
