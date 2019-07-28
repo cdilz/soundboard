@@ -10,6 +10,17 @@ const _audioSettingsDirectory = _path.join(_settingsDirectory, 'audio')
 const _audioDirectory = _path.join(_directory, 'audio')
 let _settings = []
 
+let _svg = {}
+_svg.titlebar = {}
+_svg.titlebar.maximize = `<svg width="1e3" height="1e3" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)"><path d="m19.844 52.26h224.9v224.9h-224.9z" fill="none" stroke="#000001" stroke-width="39.688" style="paint-order:normal"/></g></svg>`
+
+_svg.titlebar.restore = `<svg width="1e3" height="1e3" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)"><path transform="matrix(.26458 0 0 .26458 0 32.417)" d="m300 75v225h400v400h225v-625zm400 625v-400h-625v625h625z" fill="none" stroke="#000001" stroke-width="150" style="paint-order:normal"/></g></svg>`
+
+_svg.sound = {}
+_svg.sound.play = `<svg width="1e3" height="1e3" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)" fill="none" stroke="#000" stroke-width="39.688"><path transform="matrix(.98893 .050347 -.053932 1.0593 11.192 -15.434)" d="m18.76 269.98-10.963-201.03 220.83 90.239z" fill="#000" stroke="#000001" stroke-width="30.659" style="paint-order:normal"/></g></svg>`
+
+_svg.sound.pause = `<svg width="1e3" height="1e3" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)" fill="none" stroke="#000" stroke-width="79.374"><path d="m79.374 32.417v264.58"/><path d="m185.21 32.417v264.58"/></g></svg>`
+
 // Set up the settings and audio folders immediately
 _fs.mkdir(_audioSettingsDirectory, {recursive: true}, (err)=>{if(err){alert(err)}})
 _fs.mkdir(_audioDirectory, {recursive: true}, (err)=>{if(err){alert(err)}})
@@ -97,6 +108,7 @@ class Settings
 				</audio>
 				<div class = 'soundTop'>
 					<div class = 'playButton'>
+						${_svg.sound.play}
 					</div>
 					<div class = 'soundTitle'>
 						${title}
@@ -151,26 +163,16 @@ function _writeToDisplay()
 		{
 			if(audio.paused)
 			{
+				playButton.innerHTML = _svg.sound.pause
 				audio.play()
 			}
 			else
 			{
+				playButton.innerHTML = _svg.sound.play
 				audio.pause()
 			}
 		})
 	}
-
-	/*
-	let player =  domParser.parseFromString(html, 'text/html')
-	let playButton = player.querySelector('.playButton')
-	let audio = player.querySelector('audio')
-	playButton.addEventListener('click', (e) =>
-	{
-		audio.play()
-	})
-
-	return player
-	*/
 }
 
 function _addFilesToSettings(files)
@@ -207,21 +209,6 @@ document.addEventListener('DOMContentLoaded', () =>
 	let max    = document.querySelector('#titlebar_maximize')
 	let close  = document.querySelector('#titlebar_close')
 	let add    = document.querySelector('#titlebar_add')
-	
-	// Maximize button SVG in text for insert into UI
-	let maxsvg = `<svg width="1e3" height="1e3" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg">
-	<g transform="translate(0 -32.417)">
-		<path d="m19.844 52.26h224.9v224.9h-224.9z" fill="none" stroke="#000001" stroke-width="39.688" style="paint-order:normal"/>
-	</g>
-</svg>`
-
-	// Restore button SVG in text for insert into the UI
-	let ressvg = `<svg width="1e3" height="1e3" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg">
-	<g transform="translate(0 -32.417)">
-		<path transform="matrix(.26458 0 0 .26458 0 32.417)" d="m300 75v225h400v400h225v-625zm400 625v-400h-625v625h625z" fill="none" stroke="#000001" stroke-width="150" style="paint-order:normal"/>
-	</g>
-</svg>
-`
 
 	min.addEventListener('click',() => {window.minimize()})
 	close.addEventListener('click',() => {window.close()})
@@ -241,13 +228,13 @@ document.addEventListener('DOMContentLoaded', () =>
 
 	window.on('maximize', e =>
 	{
-		max.innerHTML = ressvg
+		max.innerHTML = _svg.titlebar.restore
 		max.classList.replace('titlebar_maximize', 'titlebar_restore')
 	})
 
 	window.on('unmaximize', e =>
 	{
-		max.innerHTML = maxsvg
+		max.innerHTML = _svg.titlebar.maximize
 		max.classList.replace('titlebar_restore', 'titlebar_maximize')
 	})
 

@@ -2,8 +2,8 @@
 {
 	user-select: none;
 	display: flex;
-	color: rgb(180, 180, 180);
-	background-color: rgb(26, 34, 50);
+	color: var(--text-color);
+	background-color: var(--titlebar-background);
 	height: 1.75rem;
 	-webkit-app-region: drag; 
 }
@@ -32,17 +32,17 @@
 
 .titlebar_button:hover
 {
-	background-color: rgb(54, 62, 78);
+	background-color: var(--titlebar-button-hover);
 }
 
 #titlebar_close:hover
 {
-	background-color: rgb(255, 0, 0);
+	background-color: var(--titlebar-button-hover-danger);
 }
 
 #titlebar_close:hover path
 {
-	stroke: rgb(255, 255, 255);
+	stroke: var(--titlebar-button-hover-danger-text);
 }
 
 .titlebar_button>svg
@@ -53,5 +53,5 @@
 
 .titlebar_button path
 {
-	stroke: rgb(180, 180, 180);
+	stroke: var(--text-color);
 }

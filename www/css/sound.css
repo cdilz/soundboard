@@ -4,8 +4,8 @@
 	flex-direction: column;
 	height: 100%;
 	width: 100%;
-	background-color: rgb(77, 85, 90);
-	color: rgb(180, 180, 180);
+	background-color: var(--sound-background);
+	color: var(--text-color);
 }
 
 audio
@@ -13,16 +13,10 @@ audio
 	display: none;
 }
 
-.soundTop
+.soundTop,.soundBottom
 {
 	display: flex;
 	flex-direction: row;
-}
-
-.playButton
-{
-	width: 2rem;
-	height: 2rem;
 }
 
 .soundTitle
@@ -35,4 +29,47 @@ audio
 {
 	white-space: nowrap;
 	overflow: hidden;
+}
+
+
+
+
+.playButton
+{
+	width: 2rem;
+	height: 2rem;
+}
+
+.playButton
+{
+	cursor:  pointer;
+	height: 100%;
+	display: flex;
+	align-content: center;
+	justify-content: center;
+	padding: 0.25rem;
+	box-sizing: border-box;
+}
+
+.playButton:hover
+{
+	background-color: var(--sound-button-hover);
+}
+
+.playButton:hover path
+{
+	stroke: var(--sound-button-hover-text);
+	fill: var(--sound-button-hover-text);
+}
+
+.playButton>svg
+{
+	width: 100%;
+	height: 100%;
+}
+
+.playButton path
+{
+	stroke: var(--text-color);
+	fill: var(--text-color);
 }
