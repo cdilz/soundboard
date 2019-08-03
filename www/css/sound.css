@@ -8,21 +8,50 @@
 	color: var(--text-color);
 }
 
-audio
+.soundContainer path{stroke: var(--sound-button-hover-text);}
+.soundContainer .fill path{fill: var(--sound-button-hover-text);}
+.soundButton
 {
-	display: none;
+	cursor: pointer;
+	display: flex;
+	align-content: center;
+	justify-content: center;
+	padding: 0.25rem;
+	box-sizing: border-box;
 }
+
+.soundButton path
+{
+	stroke-width: 1.5rem;
+}
+
+.soundButton:hover
+{
+	background-color: var(--sound-button-hover);
+	color: var(--sound-button-hover-text);
+}
+.soundButton path{stroke: var(--sound-button-hover-text);}
+.soundButton.fill path{fill: var(--sound-button-hover-text);}
+
+audio{display: none;}
 
 .soundTop,.soundBottom
 {
 	display: flex;
 	flex-direction: row;
+	height: var(--sound-inner-split-height);
+	align-items: center;
 }
+
+.soundTop{margin-bottom: var(--sound-inner-split-separaton);}
+
+.soundBottom{margin-top: var(--sound-inner-split-separaton);}
 
 .soundTitle
 {
 	height: 2rem;
 	line-height: 2rem;
+	margin-left: 0.5rem;
 }
 
 .soundTitleContainer,.soundTitle
@@ -31,45 +60,76 @@ audio
 	overflow: hidden;
 }
 
-
-
-
 .playButton
 {
-	width: 2rem;
-	height: 2rem;
+	width: var(--sound-inner-button-size);
+	height: var(--sound-inner-button-size);
 }
 
-.playButton
+.controlKey
 {
-	cursor:  pointer;
-	height: 100%;
+	width: var(--sound-inner-button-size);
+	height: var(--sound-inner-button-size);
+	font-size: 200%;
+	line-height: 2.25rem;
 	display: flex;
-	align-content: center;
+	align-items: center;
 	justify-content: center;
-	padding: 0.25rem;
-	box-sizing: border-box;
 }
 
-.playButton:hover
+.controlLight
 {
-	background-color: var(--sound-button-hover);
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.playButton:hover path
+.controlLights
 {
-	stroke: var(--sound-button-hover-text);
-	fill: var(--sound-button-hover-text);
+	width: var(--sound-inner-controls-width);
+	height: var(--sound-inner-button-size);
+	display: flex;
+	margin-left: 0.5rem;
 }
-
-.playButton>svg
+.hold
+{
+	width: var(--sound-inner-button-size);
+	height: var(--sound-inner-button-size);
+}
+.loop
+{
+	width: var(--sound-inner-button-size);
+}
+.loop g
+{
+	width: 100%;
+	height: 100%;
+}
+.loop path
 {
 	width: 100%;
 	height: 100%;
 }
 
-.playButton path
+.controlLightsLeft
 {
-	stroke: var(--text-color);
-	fill: var(--text-color);
+	width: 50%;
+}
+.controlLightsRight
+{
+	width: 50%;
+	display: flex;
+	flex-direction: column;
+}
+.controlLightsTop
+{
+	display:flex;
+	height: 1rem;
+	width: var(--sound-inner-button-size);
+}
+
+.shift,.ctrl,.alt
+{
+	width: 1rem;
+	height: 1rem;
 }
