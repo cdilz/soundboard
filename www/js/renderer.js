@@ -46,8 +46,6 @@ class Settings
 		this.options.modifier.alt = override.modifier.alt || false
 		this.options.modifier.ctrl = override.modifier.ctrl || false
 		this.options.modifier.shift = override.modifier.shift || false
-		//This is the menu key on windows, not sure on Mac
-		this.options.modifier.meta = override.modifier.meta || false
 
 		this.options.constrain = {}
 		this.options.constrain.min = override.constrain.min || 0
@@ -101,10 +99,14 @@ class Settings
 		let title = titleHolder.innerHTML
 		let filePath = this.options.filePath
 
+		let shiftLight = this.options.modifier.shift ? 'lit' : 'unlit'
+		let ctrlLight = this.options.modifier.ctrl ? 'lit' : 'unlit'
+		let altLight = this.options.modifier.alt ? 'lit' : 'unlit'
+
 		let html =
 		`
 			<div class = 'soundContainer'>
-				<audio src='${filePath}'>
+				<audio src = '${filePath}'>
 				</audio>
 				<div class = 'soundTop'>
 					<div class = 'playButton'>
@@ -115,6 +117,17 @@ class Settings
 					</div>
 				</div>
 				<div class = 'soundBottom'>
+					<div class = 'controlSwitch'>
+					</div>
+					<div class = 'controlLights'>
+					<div class = 'unlit controlLight shift'>S</div>
+					<div class = 'unlit controlLight ctrl'>C</div>
+					<div class = 'unlit controlLight alt'>A</div>
+					<div class = 'unlit controlLight loop'></div>
+					<div class = 'unlit controlLight hold'></div>
+					</div>
+					<div class = 'seekHolder'>
+					</div>
 				</div>
 			</div>
 		`
