@@ -12,13 +12,13 @@
 	--sound-background: rgb(75, 85, 90);
 	--sound-button-hover: rgb(90, 100, 105);
 	--sound-button-hover-text: rgb(195, 195, 195);
+	--sound-button-enabled-text: rgb(253, 255, 117);
 
 	--sound-height: 5rem;
 	--sound-inner-split-separaton: 0.10rem;
 	--sound-inner-split-height: calc(50% - var(--sound-inner-split-separaton));
 	--sound-inner-button-size: calc((var(--sound-height)/2) - var(--sound-inner-split-separaton));
 	--sound-inner-controls-width: calc(2 * var(--sound-inner-button-size))
-
 
 
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

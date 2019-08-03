@@ -20,7 +20,7 @@
 	box-sizing: border-box;
 }
 
-.soundButton path
+.soundButton:not(.playButton) path
 {
 	stroke-width: 1.5rem;
 }
@@ -32,6 +32,10 @@
 }
 .soundButton path{stroke: var(--sound-button-hover-text);}
 .soundButton.fill path{fill: var(--sound-button-hover-text);}
+
+.lit{color: var(--sound-button-enabled-text);}
+.lit path{stroke: var(--sound-button-enabled-text);}
+.lit.fill path{fill: var(--sound-button-enabled-text);}
 
 audio{display: none;}
 
@@ -89,7 +93,7 @@ audio{display: none;}
 	width: var(--sound-inner-controls-width);
 	height: var(--sound-inner-button-size);
 	display: flex;
-	margin-left: 0.5rem;
+	margin-left: calc(2*var(--sound-inner-split-separaton));
 }
 .hold
 {

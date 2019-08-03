@@ -4,6 +4,7 @@
 const _remote = require('electron').remote
 const _fs = require('fs')
 const _path = require('path')
+const _crypto = require('crypto')
 const _directory = _path.dirname(process.execPath)
 const _settingsDirectory = _path.join(_directory, 'settings')
 const _audioSettingsDirectory = _path.join(_settingsDirectory, 'audio')
@@ -12,16 +13,16 @@ let _settings = []
 
 let _svg = {}
 _svg.titlebar = {}
-_svg.titlebar.maximize = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><g transform="translate(0 -32.417)"><path d="m19.844 52.26h224.9v224.9h-224.9z" fill="none" stroke="#000001" stroke-width="39.688" style="paint-order:normal"/></g></svg>`
+_svg.titlebar.maximize = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)"><path d="m19.844 52.26h224.9v224.9h-224.9z" fill="none" stroke="#000001" stroke-width="39.688" style="paint-order:normal"/></g></svg>`
 
-_svg.titlebar.restore = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><g transform="translate(0 -32.417)"><path transform="matrix(.26458 0 0 .26458 0 32.417)" d="m300 75v225h400v400h225v-625zm400 625v-400h-625v625h625z" fill="none" stroke="#000001" stroke-width="150" style="paint-order:normal"/></g></svg>`
+_svg.titlebar.restore = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)"><path transform="matrix(.26458 0 0 .26458 0 32.417)" d="m300 75v225h400v400h225v-625zm400 625v-400h-625v625h625z" fill="none" stroke="#000001" stroke-width="150" style="paint-order:normal"/></g></svg>`
 
 _svg.sound = {}
-_svg.sound.play = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><g transform="translate(0 -32.417)" fill="none" stroke="#000" stroke-width="39.688"><path transform="matrix(.98893 .050347 -.053932 1.0593 11.192 -15.434)" d="m18.76 269.98-10.963-201.03 220.83 90.239z" fill="#000" stroke="#000001" stroke-width="30.659" style="paint-order:normal"/></g></svg>`
+_svg.sound.play = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)" fill="none" stroke="#000" stroke-width="39.688"><path transform="matrix(.98893 .050347 -.053932 1.0593 11.192 -15.434)" d="m18.76 269.98-10.963-201.03 220.83 90.239z" fill="#000" stroke="#000001" stroke-width="30.659" style="paint-order:normal"/></g></svg>`
 
-_svg.sound.pause = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><g transform="translate(0 -32.417)" fill="none" stroke="#000" stroke-width="79.374"><path d="m79.374 32.417v264.58"/><path d="m185.21 32.417v264.58"/></g></svg>`
+_svg.sound.pause = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)" fill="none" stroke="#000" stroke-width="79.374"><path d="m79.374 32.417v264.58"/><path d="m185.21 32.417v264.58"/></g></svg>`
 
-_svg.sound.hold = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><g transform="translate(0 -32.417)" fill="none" stroke-linejoin="round" stroke-width="26.458"><path d="m13.229 283.77h238.25l-13.361-79.374c-49.578 24.321-162.81 18.147-211.66 0z" stroke="#000"/><path d="m211.66 138.25-79.374 55.562-79.374-55.562h52.916v-92.603h52.916v92.603z" stroke="#000001" style="paint-order:normal"/></g></svg>`
+_svg.sound.hold = `<svg width="100%" height="100%" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -32.417)" fill="none" stroke-linejoin="round" stroke-width="26.458"><path d="m13.229 283.77h238.25l-13.361-79.374c-49.578 24.321-162.81 18.147-211.66 0z" stroke="#000"/><path d="m211.66 138.25-79.374 55.562-79.374-55.562h52.916v-92.603h52.916v92.603z" stroke="#000001" style="paint-order:normal"/></g></svg>`
 
 _svg.sound.loop = `<svg width="100%" height="100%"version="1.1" viewBox="0 0 264.58 110.07" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0 -154.51)" preserveAspectRatio="none"><path d="m132.29 208.86s119.44 94.611 119.06 1.2152c-0.0799-93.908-119.06-1.2152-119.06-1.2152s-120.68 94.965-119.06 1.2152c0.28959-94.808 119.06 0 119.06 0" fill="none" stroke="#000" stroke-linejoin="round" stroke-width="26.458" style="paint-order:normal"/></g></svg>`
 
@@ -34,6 +35,7 @@ class Settings
 	constructor(fileName, override = {})
 	{
 		this.fileName = fileName
+		this.id = 'id_' + _crypto.createHash('md5').update(this.fileName).digest('hex') + '_' + Date.now().toString()
 		this.options = {}
 		this.options.fileName = fileName
 		this.options.filePath = _path.join(_audioDirectory, fileName)
@@ -101,21 +103,21 @@ class Settings
 		let titleHolder = document.createElement('p')
 		titleHolder.append(this.options.fileName)
 		let title = titleHolder.innerHTML
-		let filePath = this.options.filePath
+		let filePath = this.options.filePath.replace("'", "&#39;").replace('"', '&#034;')
 
 		let shiftLight = this.options.modifier.shift ? 'lit' : 'unlit'
 		let ctrlLight = this.options.modifier.ctrl ? 'lit' : 'unlit'
 		let altLight = this.options.modifier.alt ? 'lit' : 'unlit'
 		let loopLight = this.options.loop ? 'lit' : 'unlit'
+		let loopSetting = this.options.loop ? ' loop' : ''
 		let holdLight = this.options.hold ? 'lit' : 'unlit'
 
 		let key = this.options.key ? this.options.key : '?'
 
-
 		let html =
 		`
-			<div class = 'soundContainer'>
-				<audio src = '${filePath}'>
+			<div class = 'soundContainer' id = '${this.id}'>
+				<audio src = '${filePath}'${loopSetting}>
 				</audio>
 				<div class = 'soundTop'>
 					<div class = 'soundButton playButton fill'>
@@ -168,6 +170,51 @@ function _sortSettings()
 	})
 }
 
+function _getSetting(event)
+{
+	let path = event.path
+	let soundContainer = null
+	for(let i = 0; i < path.length; i++)
+	{
+		let element = path[i]
+		if(element.classList.contains('soundContainer'))
+		{
+			soundContainer = element
+			break
+		}
+	}
+
+	if(soundContainer == null)
+	{
+		throw 'Sound Container Does Not Exist'
+	}
+
+	let id = soundContainer.id
+	for(let i = 0; i < _settings.length; i++)
+	{
+		let setting = _settings[i]
+		if(setting.id == id)
+		{
+			return setting
+		}
+	}
+}
+
+function _getParts(setting)
+{
+	let soundContainer = document.querySelector(`#${setting.id}`)
+	let output =
+	{
+		 player: soundContainer
+		,audio: soundContainer.querySelector('audio')
+		,playButton: soundContainer.querySelector('.playButton')
+		,hold: soundContainer.querySelector('.hold')
+		,loop: soundContainer.querySelector('.loop')
+	}
+
+	return output
+}
+
 function _writeToDisplay()
 {
 	// Sort display here before writing
@@ -177,7 +224,8 @@ function _writeToDisplay()
 	display.innerHTML = ''
 	for(let i = 0; i < _settings.length; i++)
 	{
-		display.innerHTML += _settings[i].toHTML()
+		let setting = _settings[i]
+		display.innerHTML += setting.toHTML()
 	}
 
 	let players = document.querySelectorAll('.soundContainer')
@@ -186,18 +234,44 @@ function _writeToDisplay()
 		let player = players[i]
 		let audio = player.querySelector('audio')
 		let playButton = player.querySelector('.playButton')
+		let hold = player.querySelector('.hold')
+		let loop = player.querySelector('.loop')
+	
 		playButton.addEventListener('click', (e) =>
 		{
+			let setting = _getSetting(e)
+			let parts = _getParts(setting)
 			if(audio.paused)
 			{
-				playButton.innerHTML = _svg.sound.pause
-				audio.play()
+				parts.playButton.innerHTML = _svg.sound.pause
+				parts.audio.play()
 			}
 			else
 			{
-				playButton.innerHTML = _svg.sound.play
-				audio.pause()
+				parts.playButton.innerHTML = _svg.sound.play
+				parts.audio.pause()
 			}
+		})
+	
+		hold.addEventListener('click', (e) =>
+		{
+			let setting = _getSetting(e)
+			let parts = _getParts(setting)
+			setting.options.hold = !setting.options.hold
+			parts.hold.classList.toggle('unlit')
+			parts.hold.classList.toggle('lit')
+			setting.save()
+		})
+	
+		loop.addEventListener('click', (e) =>
+		{
+			let setting = _getSetting(e)
+			let parts = _getParts(setting)
+			setting.options.loop = !setting.options.loop
+			parts.loop.classList.toggle('unlit')
+			parts.loop.classList.toggle('lit')
+			parts.audio.loop = !parts.audio.loop
+			setting.save()
 		})
 	}
 }
