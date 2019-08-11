@@ -5,25 +5,26 @@
 	- [x] Close
 	- [X] Add files/folders (multiple files works, can't do both files AND folders)
 	- [ ] Settings?
-
 - [ ] Audio container
 	- [ ] Delete Button
 	- [ ] Play Speed Modifier
 	- [ ] Play/Pause Button
-		- [ ] Create SVG Play Icon
-		- [ ] Create SVG Pause Icon
-		- [ ] Clicking play/pause should start/stop the audio
+		- [X] Create SVG Play Icon
+		- [X] Create SVG Pause Icon
+		- [X] Clicking play/pause should start/stop the audio
 		- [ ] Pressing a set key should start/stop the audio
 	- [ ] Title Container
 		- [ ] Title should marquee when too wide
 	- [ ] Button to set the key for this track
-		- [ ] Should display something to indicate that you can press it to change the key. Maybe create a keyboard key icon?
-		- [ ] Should display the key to use to run this
-	- [ ] Icon that lights up to show when shift, ctrl, alt, or meta keys were held with the key. Will probably just use S, C, A, and M. Can this be language independent?
+		- [X] Should display something to indicate that you can press it to change the key. Maybe create a keyboard key icon?
+		- [X] Should display the key to use to run this
+	- [X] Icon that lights up to show when shift, ctrl, or alt keys were held with the key. Will probably just use S, C, and A. Can this be language independent?
 	- [ ] Button to indicate that you need to hold the key
-		- [ ] Create icon for holding, perhaps a pressed key
+		- [X] Create icon for holding, perhaps a pressed key
+		- [ ] When button is lit you must hold the button to play the audio
 	- [ ] Button to indicate that this will loop
-		- [ ] Create icon for looping, perhaps an infinity with an arrow in it
+		- [X] Create icon for looping, perhaps an infinity with an arrow in it
+		- [ ] When button is lit the audio will loop (currently working, but I don't have clamping yet so holding off on checking this)
 	- [ ] Button to indicate that this will force restart instead of paused (when key pressed again or let go in hold or pause button pressed)
 		- [ ] Create icon for restart, perhaps a sideways U-turn symbol would work here?
 	- [ ] Volume Control
