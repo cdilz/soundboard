@@ -10,6 +10,10 @@ const _settingsDirectory = _path.join(_directory, 'settings')
 const _audioSettingsDirectory = _path.join(_settingsDirectory, 'audio')
 const _audioDirectory = _path.join(_directory, 'audio')
 let _settings = []
+let _waitingForInput = []
+let _keyTimestamp = 0
+let _keySettings = {}
+_keyDefaults()
 
 let _svg = {}
 _svg.titlebar = {}
@@ -89,7 +93,7 @@ class Settings
 		{
 			let path = _path.join(_audioSettingsDirectory, this.fileName + '.json')
 			let settings = JSON.stringify(this.options)
-			_fs.writeFileSync(path, settings, {encoding: 'utf8'})
+			_fs.writeFile(path, settings, {encoding: 'utf8'}, ()=>{})
 			return this
 		}
 		catch(e)
@@ -113,6 +117,7 @@ class Settings
 		let holdLight = this.options.hold ? 'lit' : 'unlit'
 
 		let key = this.options.key ? this.options.key : '?'
+		let keyClass = this.options.key ? ' set' : ''
 
 		let html =
 		`
@@ -128,7 +133,7 @@ class Settings
 					</div>
 				</div>
 				<div class = 'soundBottom'>
-					<div class = 'soundButton controlKey'>
+					<div class = 'soundButton controlKey${keyClass}'>
 						${key}
 					</div>
 					<div class = 'controlLights'>
@@ -207,12 +212,27 @@ function _getParts(setting)
 	{
 		 player: soundContainer
 		,audio: soundContainer.querySelector('audio')
-		,playButton: soundContainer.querySelector('.playButton')
+		,play: soundContainer.querySelector('.playButton')
 		,hold: soundContainer.querySelector('.hold')
 		,loop: soundContainer.querySelector('.loop')
+		,key: soundContainer.querySelector('.controlKey')
+		,alt: soundContainer.querySelector('.alt')
+		,shift: soundContainer.querySelector('.shift')
+		,ctrl: soundContainer.querySelector('.ctrl')
 	}
 
 	return output
+}
+
+function _keyDefaults()
+{	
+	_keySettings =
+	{
+		 ctrl: false
+		,alt: false
+		,shift: false
+		,key: ''
+	}
 }
 
 function _writeToDisplay()
@@ -233,26 +253,29 @@ function _writeToDisplay()
 	{
 		let player = players[i]
 		let audio = player.querySelector('audio')
-		let playButton = player.querySelector('.playButton')
+		let play = player.querySelector('.playButton')
 		let hold = player.querySelector('.hold')
 		let loop = player.querySelector('.loop')
+		let key = player.querySelector('.controlKey')
 	
-		playButton.addEventListener('click', (e) =>
+		// Toggle if the particular track is playing/paused
+		play.addEventListener('click', (e) =>
 		{
 			let setting = _getSetting(e)
 			let parts = _getParts(setting)
 			if(audio.paused)
 			{
-				parts.playButton.innerHTML = _svg.sound.pause
+				parts.play.innerHTML = _svg.sound.pause
 				parts.audio.play()
 			}
 			else
 			{
-				parts.playButton.innerHTML = _svg.sound.play
+				parts.play.innerHTML = _svg.sound.play
 				parts.audio.pause()
 			}
 		})
 	
+		// Toggle whether you must hold the key to play
 		hold.addEventListener('click', (e) =>
 		{
 			let setting = _getSetting(e)
@@ -263,6 +286,7 @@ function _writeToDisplay()
 			setting.save()
 		})
 	
+		// Toggle whether the track loops at the end
 		loop.addEventListener('click', (e) =>
 		{
 			let setting = _getSetting(e)
@@ -273,6 +297,168 @@ function _writeToDisplay()
 			parts.audio.loop = !parts.audio.loop
 			setting.save()
 		})
+
+		// Enable the kotkey entry system to start or stop listening for keypresses
+		key.addEventListener('click', (e) =>
+		{
+			let setting = _getSetting(e)
+			let parts = _getParts(setting)
+			parts.key.classList.toggle('waitingForInput')
+			if(parts.key.classList.contains('waitingForInput'))
+			{
+				_waitingForInput.push(setting)
+			}
+			else
+			{
+				let newArray = []
+				for(let i = 0; i < _waitingForInput.length; i++)
+				{
+					if(_waitingForInput[i] != setting)
+					{
+						newArray.push(_waitingForInput[i])
+					}
+					else
+					{
+						// This should allow people to stop waiting for input while holding a key combination
+						_lightKeys(_waitingForInput[i])
+					}
+				}
+
+				_waitingForInput = newArray
+			}
+		})
+
+		// Perform key entry
+		document.addEventListener('keydown', (e) =>
+		{
+			if(_waitingForInput.length > 0)
+			{
+				_keySettings.ctrl = e.ctrlKey
+				_keySettings.alt = e.altKey
+				_keySettings.shift = e.shiftKey
+				_keySettings.key = e.key
+	
+				if(e.timeStamp != _keyTimestamp && !e.repeat)
+				{
+					for(let i = 0; i < _waitingForInput.length; i++)
+					{
+						_keyDown(_waitingForInput[i])
+					}
+				}
+			}
+			
+		})
+		
+		document.addEventListener('keyup', (e) =>
+		{
+			if(_waitingForInput.length > 0)
+			{
+				_keySettings.ctrl = e.ctrlKey
+				_keySettings.alt = e.altKey
+				_keySettings.shift = e.shiftKey
+		
+				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
+				let clear = e.key == 'Backspace' || e.key == 'Delete'
+
+				if(cancel)
+				{
+					_keyDefaults()
+				}
+
+				// Don't register a key if it's longer than 1 character.
+				// This prevents the modifier keys from showing up, but also preserves the space in the UI
+				if(e.key.length == 1)
+				{
+					_keySettings.key = e.key
+				}
+				else
+				{
+					_keySettings.key = ''
+				}
+
+				if(e.timeStamp != _keyTimestamp && !e.repeat)
+				{
+					if(clear)
+					{
+						_waitingForInput.forEach((setting) =>
+						{
+							setting.options.modifier.ctrl = false
+							setting.options.modifier.shift = false
+							setting.options.modifier.alt = false
+							_lightKeys(setting)
+							setting.options.key = null
+							let parts = _getParts(setting)
+							parts.key.innerHTML = '?'
+							parts.key.classList.remove('set')
+
+							setting.save()
+						})
+					}
+
+					if(cancel)
+					{
+						_waitingForInput.forEach((setting) =>
+						{
+							let parts = _getParts(setting)
+							parts.key.click()
+						})
+					}
+					else
+					{
+						_waitingForInput.forEach((setting) =>{_keyUp(setting)})
+					}
+				}
+				
+				_keyTimestamp = e.timeStamp
+			}
+		})
+	}
+}
+
+function _lightKeys(setting, override)
+{
+	let parts = _getParts(setting)
+	let ctrl = setting.options.modifier.ctrl
+	let shift = setting.options.modifier.shift
+	let alt = setting.options.modifier.alt
+
+	if(override)
+	{
+		ctrl = override.ctrl
+		shift = override.shift
+		alt = override.alt
+	}
+
+	// If the ctrl key is pressed light it up, otherwise unlight it
+	parts.ctrl.classList.add(ctrl?'lit':'unlit')
+	parts.ctrl.classList.remove(ctrl?'unlit':'lit')
+
+	// If the shift key is pressed light it up, otherwise unlight it
+	parts.shift.classList.add(shift?'lit':'unlit')
+	parts.shift.classList.remove(shift?'unlit':'lit')
+
+	// If the alt key is pressed light it up, otherwise unlight it
+	parts.alt.classList.add(alt?'lit':'unlit')
+	parts.alt.classList.remove(alt?'unlit':'lit')
+}
+
+function _keyDown(setting)
+{
+	_lightKeys(setting, _keySettings)
+}
+
+function _keyUp(setting)
+{	
+	_lightKeys(setting, _keySettings)
+	if(_keySettings.key != '')
+	{
+		let parts = _getParts(setting)
+		setting.options.modifier.ctrl = _keySettings.ctrl
+		setting.options.modifier.shift = _keySettings.shift
+		setting.options.modifier.alt = _keySettings.alt
+		setting.options.key = _keySettings.key
+		parts.key.innerHTML = setting.options.key
+		setting.save()
 	}
 }
 

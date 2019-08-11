@@ -137,3 +137,41 @@ audio{display: none;}
 	width: 1rem;
 	height: 1rem;
 }
+
+@keyframes waiting
+{
+	0%
+	{
+		background-color: var(--sound-background);
+	}
+	50%
+	{
+		background-color: var(--text-color);
+	}
+	100%
+	{
+		background-color: var(--sound-background);
+	}
+}
+
+.waitingForInput
+{
+	animation-name: waiting;
+	animation-iteration-count: infinite;
+	animation-duration: 3s;
+	color: var(--sound-button-enabled-text);
+}
+
+.waitingForInput:hover
+{
+	color: var(--sound-button-enabled-text);
+}
+
+.set
+{
+	color: var(--sound-button-enabled-text);
+}
+.set:hover
+{
+	color: var(--sound-button-enabled-text);
+}
