@@ -29,6 +29,7 @@ html, body, div
 {
 	padding: 0;
 	margin: 0;
+	overflow: hidden;
 }
 
 body, html
@@ -49,5 +50,6 @@ body, html
 	column-gap: 1rem;
 	width: 100%;
 	height: calc(100% - 1.75rem);
-	background-color: var(--app-background)
+	background-color: var(--app-background);
+	overflow-y: auto;
 }
