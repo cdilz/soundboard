@@ -372,8 +372,9 @@ function _keyUp(setting)
 		setting.options.modifier.shift = _keySettings.shift
 		setting.options.modifier.alt = _keySettings.alt
 		setting.options.key = _keySettings.key
-		parts.key.innerHTML = setting.options.key
 		setting.save()
+		parts.key.innerHTML = setting.options.key
+		parts.key.classList.add('set')
 		parts.key.click()
 	}
 }
