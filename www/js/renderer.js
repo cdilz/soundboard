@@ -327,91 +327,6 @@ function _writeToDisplay()
 				_waitingForInput = newArray
 			}
 		})
-
-		// Perform key entry
-		document.addEventListener('keydown', (e) =>
-		{
-			if(_waitingForInput.length > 0)
-			{
-				_keySettings.ctrl = e.ctrlKey
-				_keySettings.alt = e.altKey
-				_keySettings.shift = e.shiftKey
-				_keySettings.key = e.key
-	
-				if(e.timeStamp != _keyTimestamp && !e.repeat)
-				{
-					for(let i = 0; i < _waitingForInput.length; i++)
-					{
-						_keyDown(_waitingForInput[i])
-					}
-				}
-			}
-			
-		})
-		
-		document.addEventListener('keyup', (e) =>
-		{
-			if(_waitingForInput.length > 0)
-			{
-				_keySettings.ctrl = e.ctrlKey
-				_keySettings.alt = e.altKey
-				_keySettings.shift = e.shiftKey
-		
-				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
-				let clear = e.key == 'Backspace' || e.key == 'Delete'
-
-				if(cancel)
-				{
-					_keyDefaults()
-				}
-
-				// Don't register a key if it's longer than 1 character.
-				// This prevents the modifier keys from showing up, but also preserves the space in the UI
-				if(e.key.length == 1)
-				{
-					_keySettings.key = e.key
-				}
-				else
-				{
-					_keySettings.key = ''
-				}
-
-				if(e.timeStamp != _keyTimestamp && !e.repeat)
-				{
-					if(clear)
-					{
-						_waitingForInput.forEach((setting) =>
-						{
-							setting.options.modifier.ctrl = false
-							setting.options.modifier.shift = false
-							setting.options.modifier.alt = false
-							_lightKeys(setting)
-							setting.options.key = null
-							let parts = _getParts(setting)
-							parts.key.innerHTML = '?'
-							parts.key.classList.remove('set')
-
-							setting.save()
-						})
-					}
-
-					if(cancel)
-					{
-						_waitingForInput.forEach((setting) =>
-						{
-							let parts = _getParts(setting)
-							parts.key.click()
-						})
-					}
-					else
-					{
-						_waitingForInput.forEach((setting) =>{_keyUp(setting)})
-					}
-				}
-				
-				_keyTimestamp = e.timeStamp
-			}
-		})
 	}
 }
 
@@ -459,6 +374,7 @@ function _keyUp(setting)
 		setting.options.key = _keySettings.key
 		parts.key.innerHTML = setting.options.key
 		setting.save()
+		parts.key.click()
 	}
 }
 
@@ -544,6 +460,115 @@ document.addEventListener('DOMContentLoaded', () =>
 				_addFilesToSettings(files)
 			}
 		
+	})
+
+	// Perform key entry
+	document.addEventListener('keydown', (e) =>
+	{
+		ctrl = e.ctrlKey
+		alt = e.altKey
+		shift = e.shiftKey
+		key = e.key
+
+		if(_waitingForInput.length > 0)
+		{
+			_keySettings.ctrl = ctrl
+			_keySettings.alt = alt
+			_keySettings.shift = shift
+			_keySettings.key = key
+
+			if(e.timeStamp != _keyTimestamp && !e.repeat)
+			{
+				for(let i = 0; i < _waitingForInput.length; i++)
+				{
+					_keyDown(_waitingForInput[i])
+				}
+			}
+		}
+		else if(_waitingForInput.length == 0)
+		{
+			if(e.timeStamp != _keyTimestamp && !e.repeat)
+			{
+				for(let i = 0; i < _settings.length; i++)
+				{
+					let setting = _settings[i]
+					let ctrlBool = setting.options.modifier.ctrl == ctrl
+					let altBool = setting.options.modifier.alt == alt
+					let shiftBool = setting.options.modifier.shift == shift
+					let keyBool = setting.options.key == key
+					if(ctrlBool && altBool && shiftBool && keyBool)
+					{
+						let player = document.querySelector(`#${setting.id}`)
+						player.querySelector('.playButton').click()
+					}
+				}
+			}
+		}
+		_keyTimestamp = e.timeStamp		
+	})
+	
+	document.addEventListener('keyup', (e) =>
+	{
+		if(_waitingForInput.length > 0)
+		{
+			_keySettings.ctrl = e.ctrlKey
+			_keySettings.alt = e.altKey
+			_keySettings.shift = e.shiftKey
+	
+			let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
+			let clear = e.key == 'Backspace' || e.key == 'Delete'
+
+			if(cancel)
+			{
+				_keyDefaults()
+			}
+
+			// Don't register a key if it's longer than 1 character.
+			// This prevents the modifier keys from showing up, but also preserves the space in the UI
+			if(e.key.length == 1)
+			{
+				_keySettings.key = e.key
+			}
+			else
+			{
+				_keySettings.key = ''
+			}
+
+			if(e.timeStamp != _keyTimestamp && !e.repeat)
+			{
+				if(clear)
+				{
+					_waitingForInput.forEach((setting) =>
+					{
+						setting.options.modifier.ctrl = false
+						setting.options.modifier.shift = false
+						setting.options.modifier.alt = false
+						_lightKeys(setting)
+						setting.options.key = null
+						let parts = _getParts(setting)
+						parts.key.innerHTML = '?'
+						parts.key.classList.remove('set')
+
+						setting.save()
+					})
+				}
+
+				if(cancel)
+				{
+					_waitingForInput.forEach((setting) =>
+					{
+						let parts = _getParts(setting)
+						parts.key.click()
+					})
+				}
+				else
+				{
+					_waitingForInput.forEach((setting) =>{_keyUp(setting)})
+				}
+			}
+			
+			_keyTimestamp = e.timeStamp
+		}
 	})
 
 	_fs.readdir(_audioDirectory, (err, files) =>
