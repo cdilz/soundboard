@@ -62,6 +62,25 @@ class Settings
 		this.options.constrain.max = override.constrain.max || 1
 	}
 
+	get parts()
+	{
+		let soundContainer = document.querySelector(`#${this.id}`)
+		let output =
+		{
+			 player: soundContainer
+			,audio: soundContainer.querySelector('audio')
+			,play: soundContainer.querySelector('.playButton')
+			,hold: soundContainer.querySelector('.hold')
+			,loop: soundContainer.querySelector('.loop')
+			,key: soundContainer.querySelector('.controlKey')
+			,alt: soundContainer.querySelector('.alt')
+			,shift: soundContainer.querySelector('.shift')
+			,ctrl: soundContainer.querySelector('.ctrl')
+		}
+	
+		return output
+	}
+
 	static load(fileName)
 	{
 		try
@@ -205,25 +224,6 @@ function _getSetting(event)
 	}
 }
 
-function _getParts(setting)
-{
-	let soundContainer = document.querySelector(`#${setting.id}`)
-	let output =
-	{
-		 player: soundContainer
-		,audio: soundContainer.querySelector('audio')
-		,play: soundContainer.querySelector('.playButton')
-		,hold: soundContainer.querySelector('.hold')
-		,loop: soundContainer.querySelector('.loop')
-		,key: soundContainer.querySelector('.controlKey')
-		,alt: soundContainer.querySelector('.alt')
-		,shift: soundContainer.querySelector('.shift')
-		,ctrl: soundContainer.querySelector('.ctrl')
-	}
-
-	return output
-}
-
 function _keyDefaults()
 {	
 	_keySettings =
@@ -262,7 +262,7 @@ function _writeToDisplay()
 		play.addEventListener('click', (e) =>
 		{
 			let setting = _getSetting(e)
-			let parts = _getParts(setting)
+			let parts = setting.parts
 			if(audio.paused)
 			{
 				parts.play.innerHTML = _svg.sound.pause
@@ -279,7 +279,7 @@ function _writeToDisplay()
 		hold.addEventListener('click', (e) =>
 		{
 			let setting = _getSetting(e)
-			let parts = _getParts(setting)
+			let parts = setting.parts
 			setting.options.hold = !setting.options.hold
 			parts.hold.classList.toggle('unlit')
 			parts.hold.classList.toggle('lit')
@@ -290,7 +290,7 @@ function _writeToDisplay()
 		loop.addEventListener('click', (e) =>
 		{
 			let setting = _getSetting(e)
-			let parts = _getParts(setting)
+			let parts = setting.parts
 			setting.options.loop = !setting.options.loop
 			parts.loop.classList.toggle('unlit')
 			parts.loop.classList.toggle('lit')
@@ -302,7 +302,7 @@ function _writeToDisplay()
 		key.addEventListener('click', (e) =>
 		{
 			let setting = _getSetting(e)
-			let parts = _getParts(setting)
+			let parts = setting.parts
 			parts.key.classList.toggle('waitingForInput')
 			if(parts.key.classList.contains('waitingForInput'))
 			{
@@ -332,7 +332,7 @@ function _writeToDisplay()
 
 function _lightKeys(setting, override)
 {
-	let parts = _getParts(setting)
+	let parts = setting.parts
 	let ctrl = setting.options.modifier.ctrl
 	let shift = setting.options.modifier.shift
 	let alt = setting.options.modifier.alt
@@ -367,7 +367,7 @@ function _keyUp(setting)
 	_lightKeys(setting, _keySettings)
 	if(_keySettings.key != '')
 	{
-		let parts = _getParts(setting)
+		let parts = setting.parts
 		setting.options.modifier.ctrl = _keySettings.ctrl
 		setting.options.modifier.shift = _keySettings.shift
 		setting.options.modifier.alt = _keySettings.alt
@@ -466,63 +466,47 @@ document.addEventListener('DOMContentLoaded', () =>
 	// Perform key entry
 	document.addEventListener('keydown', (e) =>
 	{
-		ctrl = e.ctrlKey
-		alt = e.altKey
-		shift = e.shiftKey
-		key = e.key
+		_keySettings.ctrl = e.ctrlKey
+		_keySettings.alt = e.altKey
+		_keySettings.shift = e.shiftKey
+		_keySettings.key = e.key
 
-		if(_waitingForInput.length > 0)
+		if(e.timeStamp != _keyTimestamp && !e.repeat)
 		{
-			_keySettings.ctrl = ctrl
-			_keySettings.alt = alt
-			_keySettings.shift = shift
-			_keySettings.key = key
-
-			if(e.timeStamp != _keyTimestamp && !e.repeat)
+			if(_waitingForInput.length > 0)
 			{
 				for(let i = 0; i < _waitingForInput.length; i++)
 				{
 					_keyDown(_waitingForInput[i])
 				}
 			}
-		}
-		else if(_waitingForInput.length == 0)
-		{
-			if(e.timeStamp != _keyTimestamp && !e.repeat)
+			else if(_waitingForInput.length == 0)
 			{
 				for(let i = 0; i < _settings.length; i++)
 				{
 					let setting = _settings[i]
-					let ctrlBool = setting.options.modifier.ctrl == ctrl
-					let altBool = setting.options.modifier.alt == alt
-					let shiftBool = setting.options.modifier.shift == shift
-					let keyBool = setting.options.key == key
+					let ctrlBool = setting.options.modifier.ctrl == _keySettings.ctrl
+					let altBool = setting.options.modifier.alt == _keySettings.alt
+					let shiftBool = setting.options.modifier.shift == _keySettings.shift
+					let keyBool = setting.options.key == _keySettings.key
 					if(ctrlBool && altBool && shiftBool && keyBool)
 					{
-						let player = document.querySelector(`#${setting.id}`)
-						player.querySelector('.playButton').click()
+						let parts = setting.parts
+						parts.play.click()
 					}
 				}
 			}
 		}
-		_keyTimestamp = e.timeStamp		
+		_keyTimestamp = e.timeStamp
 	})
 	
 	document.addEventListener('keyup', (e) =>
 	{
-		if(_waitingForInput.length > 0)
+		if(e.timeStamp != _keyTimestamp && !e.repeat)
 		{
 			_keySettings.ctrl = e.ctrlKey
 			_keySettings.alt = e.altKey
 			_keySettings.shift = e.shiftKey
-	
-			let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
-			let clear = e.key == 'Backspace' || e.key == 'Delete'
-
-			if(cancel)
-			{
-				_keyDefaults()
-			}
 
 			// Don't register a key if it's longer than 1 character.
 			// This prevents the modifier keys from showing up, but also preserves the space in the UI
@@ -535,8 +519,16 @@ document.addEventListener('DOMContentLoaded', () =>
 				_keySettings.key = ''
 			}
 
-			if(e.timeStamp != _keyTimestamp && !e.repeat)
-			{
+			if(_waitingForInput.length > 0)
+			{		
+				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
+				let clear = e.key == 'Backspace' || e.key == 'Delete'
+
+				if(cancel)
+				{
+					_keyDefaults()
+				}
+
 				if(clear)
 				{
 					_waitingForInput.forEach((setting) =>
@@ -546,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () =>
 						setting.options.modifier.alt = false
 						_lightKeys(setting)
 						setting.options.key = null
-						let parts = _getParts(setting)
+						let parts = setting.parts
 						parts.key.innerHTML = '?'
 						parts.key.classList.remove('set')
 
@@ -558,7 +550,7 @@ document.addEventListener('DOMContentLoaded', () =>
 				{
 					_waitingForInput.forEach((setting) =>
 					{
-						let parts = _getParts(setting)
+						let parts = setting.parts
 						parts.key.click()
 					})
 				}
@@ -567,9 +559,25 @@ document.addEventListener('DOMContentLoaded', () =>
 					_waitingForInput.forEach((setting) =>{_keyUp(setting)})
 				}
 			}
-			
-			_keyTimestamp = e.timeStamp
+			else if(_waitingForInput.length == 0)
+			{/*
+				for(let i = 0; i < _settings.length; i++)
+				{
+					let setting = _settings[i]
+					let ctrlBool = setting.options.modifier.ctrl == ctrl
+					let altBool = setting.options.modifier.alt == alt
+					let shiftBool = setting.options.modifier.shift == shift
+					let keyBool = setting.options.key == key
+					if(!(ctrlBool && altBool && shiftBool && keyBool))
+					{
+						player.querySelector('.playButton').click()
+					}
+				}
+				*/
+			}
 		}
+			
+		_keyTimestamp = e.timeStamp
 	})
 
 	_fs.readdir(_audioDirectory, (err, files) =>
