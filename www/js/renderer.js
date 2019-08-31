@@ -3,16 +3,11 @@
 // All of the Node.js APIs are available in this process.
 const _fs = require('fs')
 const _path = require('path')
-const _crypto = require('crypto')
 const _directory = _path.dirname(process.execPath)
 const _settingsDirectory = _path.join(_directory, 'settings')
 const _audioSettingsDirectory = _path.join(_settingsDirectory, 'audio')
 const _audioDirectory = _path.join(_directory, 'audio')
 let _settings = []
-let _waitingForInput = []
-let _keySettings = {}
-let _prevKeySettings = {}
-_keyDefaults()
 
 // Set up the settings and audio folders immediately
 _fs.mkdir(_audioSettingsDirectory, {recursive: true}, (err)=>{if(err){alert(err)}})
@@ -37,17 +32,6 @@ function _sortSettings()
 	})
 }
 
-function _keyDefaults()
-{	
-	_keySettings =
-	{
-		 ctrl: false
-		,alt: false
-		,shift: false
-		,key: ''
-	}
-}
-
 function _writeToDisplay()
 {
 	// Sort display here before writing
@@ -64,28 +48,6 @@ function _writeToDisplay()
 	{
 		let setting = _settings[i]
 		setting.addEvents()
-	}
-}
-
-function _keyDown(setting)
-{
-	setting.lightKeys(_keySettings)
-}
-
-function _keyUp(setting)
-{	
-	setting.lightKeys(_keySettings)
-	if(_keySettings.key != '')
-	{
-		let parts = setting.parts
-		setting.options.modifier.ctrl = _keySettings.ctrl
-		setting.options.modifier.shift = _keySettings.shift
-		setting.options.modifier.alt = _keySettings.alt
-		setting.options.key = _keySettings.key
-		setting.save()
-		parts.key.innerHTML = setting.options.key
-		parts.key.classList.add('set')
-		parts.key.click()
 	}
 }
 
@@ -133,23 +95,20 @@ function _getWaiting()
 
 document.addEventListener('DOMContentLoaded', () =>
 {
-	// Perform key entry
 	document.addEventListener('keydown', (e) =>
 	{
-		_keySettings.ctrl = e.ctrlKey
-		_keySettings.alt = e.altKey
-		_keySettings.shift = e.shiftKey
-		_keySettings.key = e.key
-
+		// Don't repeat if the key is being held
 		if(!e.repeat)
 		{
 			let waitingForInput = _getWaiting()
 
+			// If there is audio waiting for input we don't want to accidentally play anything
 			if(waitingForInput.length > 0)
 			{
 				for(let i = 0; i < waitingForInput.length; i++)
 				{
-					_keyDown(waitingForInput[i])
+					// Light up the settings keys and overwrite the defaults with our new potentials
+					waitingForInput[i].lightKeys(keypress.settings)
 				}
 			}
 			else if(waitingForInput.length == 0)
@@ -157,11 +116,13 @@ document.addEventListener('DOMContentLoaded', () =>
 				for(let i = 0; i < _settings.length; i++)
 				{
 					let setting = _settings[i]
-					let ctrlBool = setting.options.modifier.ctrl == _keySettings.ctrl
-					let altBool = setting.options.modifier.alt == _keySettings.alt
-					let shiftBool = setting.options.modifier.shift == _keySettings.shift
-					let keyBool = setting.options.key == _keySettings.key
-					if(ctrlBool && altBool && shiftBool && keyBool)
+					let alt = setting.options.modifier.alt
+					let ctrl = setting.options.modifier.ctrl
+					let shift = setting.options.modifier.shift
+					let key = setting.options.key
+
+					// If the key is pressed then play the audio
+					if(keypress.isPressed(alt, ctrl, shift, key))
 					{
 						let parts = setting.parts
 						parts.play.click()
@@ -173,52 +134,28 @@ document.addEventListener('DOMContentLoaded', () =>
 	
 	document.addEventListener('keyup', (e) =>
 	{
+		// Don't repeat if the key is being held
 		if(!e.repeat)
 		{
 			let waitingForInput = _getWaiting()
-			_prevKeySettings = JSON.parse(JSON.stringify(_keySettings))
-			_keySettings.ctrl = e.ctrlKey
-			_keySettings.alt = e.altKey
-			_keySettings.shift = e.shiftKey
-
-			// Don't register a key if it's longer than 1 character.
-			// This prevents the modifier keys from showing up, but also preserves the space in the UI
-			if(e.key.length == 1)
-			{
-				_keySettings.key = e.key
-			}
-			else
-			{
-				_keySettings.key = ''
-			}
-
+	
+			// If there is audio waiting for input we don't want to accidentally pause anything
 			if(waitingForInput.length > 0)
 			{		
+				// We have a few options to clear a key or cancel input
 				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
 				let clear = e.key == 'Backspace' || e.key == 'Delete'
 
-				if(cancel)
-				{
-					_keyDefaults()
-				}
-
+				// If we're clearing the key run the clear function
 				if(clear)
 				{
 					waitingForInput.forEach((setting) =>
 					{
-						setting.options.modifier.ctrl = false
-						setting.options.modifier.shift = false
-						setting.options.modifier.alt = false
-						setting.lightKeys()
-						setting.options.key = null
-						let parts = setting.parts
-						parts.key.innerHTML = '?'
-						parts.key.classList.remove('set')
-
-						setting.save()
+						setting.clear()
 					})
 				}
 
+				// If we're cancelling input just click the key entry button again
 				if(cancel)
 				{
 					waitingForInput.forEach((setting) =>
@@ -229,7 +166,24 @@ document.addEventListener('DOMContentLoaded', () =>
 				}
 				else
 				{
-					waitingForInput.forEach((setting) =>{_keyUp(setting)})
+					waitingForInput.forEach((setting) =>
+					{
+						// Adjust keys for the ones that are lifted						
+						setting.lightKeys(keypress.settings)
+						// If lifting a non-modifier key then save it
+						if(!keypress.isKeyPressed)
+						{
+							let parts = setting.parts
+							setting.options.modifier.ctrl = keypress.ctrl
+							setting.options.modifier.shift = keypress.shift
+							setting.options.modifier.alt = keypress.alt
+							setting.options.key = keypress.latest
+							setting.save()
+							parts.key.innerHTML = setting.options.key
+							parts.key.classList.add('set')
+							parts.key.click()
+						}
+					})
 				}
 			}
 			else if(waitingForInput.length == 0)
@@ -237,13 +191,19 @@ document.addEventListener('DOMContentLoaded', () =>
 				for(let i = 0; i < _settings.length; i++)
 				{
 					let setting = _settings[i]
-					let ctrlBool = setting.options.modifier.ctrl == _prevKeySettings.ctrl
-					let altBool = setting.options.modifier.alt == _prevKeySettings.alt
-					let shiftBool = setting.options.modifier.shift == _prevKeySettings.shift
-					let keyBool = setting.options.key == _prevKeySettings.key
-					if(ctrlBool && altBool && shiftBool && keyBool && setting.options.hold)
+					let alt = setting.options.modifier.alt
+					let ctrl = setting.options.modifier.ctrl
+					let shift = setting.options.modifier.shift
+					let hold = setting.options.hold
+					let key = setting.options.key
+
+					// If the key is pressed not pressed then pause the audio if it's a hold
+					if(!keypress.isPressed(alt, ctrl, shift, key) && hold)
 					{
-						setting.parts.player.querySelector('.playButton').click()
+						if(!setting.parts.audio.paused)
+						{
+							setting.parts.player.querySelector('.playButton').click()
+						}
 					}
 				}
 			}

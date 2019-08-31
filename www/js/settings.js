@@ -1,3 +1,5 @@
+const _crypto = require('crypto')
+
 class Settings
 {
 	constructor(fileName, override = {})
@@ -93,6 +95,20 @@ class Settings
 		{
 			throw e
 		}
+	}
+
+	// Resets the key entry button and lights to a default state
+	clear()
+	{
+		this.options.modifier.alt = false
+		this.options.modifier.ctrl = false
+		this.options.modifier.shift = false
+		this.lightKeys()
+		this.options.key = null
+		let parts = this.parts
+		parts.key.innerHTML = '?'
+		parts.key.classList.remove('set')
+		this.save()
 	}
 
 	save()

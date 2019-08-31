@@ -12,10 +12,11 @@
 		- [X] Create SVG Play Icon
 		- [X] Create SVG Pause Icon
 		- [X] Clicking play/pause should start/stop the audio
-		- [ ] Pressing a set key should start/stop the audio
+		- [X] Pressing a set key should start/stop the audio
+		- [ ] Require button to be held for hold? Currently any key pressed will stop a manual play if it's set to hold
 	- [ ] Title Container
 		- [ ] Title should marquee when too wide
-	- [ ] Button to set the key for this track
+	- [X] Button to set the key for this track
 		- [X] Should display something to indicate that you can press it to change the key. Maybe create a keyboard key icon?
 		- [X] Should display the key to use to run this
 	- [X] Icon that lights up to show when shift, ctrl, or alt keys were held with the key. Will probably just use S, C, and A. Can this be language independent?
