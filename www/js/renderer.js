@@ -93,6 +93,34 @@ function _getWaiting()
 	return output
 }
 
+function _marquee()
+{
+	for(let i = 0; i < _settings.length; i++)
+	{
+		let parts = _settings[i].parts
+		let title = parts.title
+		let titleInner = parts.titleInner
+		// Remove all previous dupes in case we don't need to scroll anymore
+		let filler = parts.title.querySelectorAll('.soundTitleInnerDupe')
+		// Remove the marquee to check if the width without margins fits
+		title.classList.remove('soundTitleMarquee')
+		filler.forEach((ele) => {ele.remove()})
+
+		// If the title's content goes outside its bounding box
+		if(title.clientWidth < title.scrollWidth)
+		{
+			title.classList.add('soundTitleMarquee')
+			// Add a duplicate of the track title so we can marquee
+			let dupe = document.createElement('p')
+			dupe.classList.add('soundTitleInnerDupe')
+			dupe.classList.add('soundTitleInner')
+			dupe.innerHTML = titleInner.innerHTML
+
+			title.append(dupe)
+		}
+	}
+}
+
 document.addEventListener('DOMContentLoaded', () =>
 {
 	document.addEventListener('keydown', (e) =>
@@ -210,6 +238,11 @@ document.addEventListener('DOMContentLoaded', () =>
 		}
 	})
 
+	window.addEventListener('resize', (e) =>
+	{
+		_marquee()
+	})
+
 	_fs.readdir(_audioDirectory, (err, files) =>
 	{
 		let audioFiles = []
@@ -219,5 +252,33 @@ document.addEventListener('DOMContentLoaded', () =>
 		}
 
 		_addFilesToSettings(audioFiles)
+		_marquee()
 	})
 })
+
+function _marqueeScroll()
+{
+	let marquees = document.querySelectorAll('.soundTitleMarquee')
+	for(let i = 0; i < marquees.length; i++)
+	{
+		let m = marquees[i]
+		let child = m.children[0]
+		let childStyle = getComputedStyle(child)
+		m.scrollBy({left: 1, top: 0})
+
+		// How far the element is scrolled
+		let titleX = m.scrollLeft
+
+		// The width of the child, plus margin
+		let childX = child.offsetWidth + parseInt(childStyle.marginLeft) + parseInt(childStyle.marginRight)
+
+		// If the child is scrolled past the edge of the parent
+		if(childX < titleX)
+		{
+			m.append(child)
+			m.scrollLeft = 0
+		}
+	}
+}
+
+setInterval(_marqueeScroll, 10)

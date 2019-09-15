@@ -42,6 +42,8 @@ class Settings
 			,alt: soundContainer.querySelector('.alt')
 			,shift: soundContainer.querySelector('.shift')
 			,ctrl: soundContainer.querySelector('.ctrl')
+			,title: soundContainer.querySelector('.soundTitle')
+			,titleInner: soundContainer.querySelector('.soundTitleInner')
 		}
 	
 		return output
@@ -153,7 +155,9 @@ class Settings
 						${_svg.sound.play}
 					</div>
 					<div class = 'soundTitle'>
-						${title}
+						<p class = 'soundTitleInner'>
+							${title}
+						</p>
 					</div>
 				</div>
 				<div class = 'soundBottom'>

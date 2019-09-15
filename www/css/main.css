@@ -38,6 +38,11 @@ body, html
 	width: 100%;
 }
 
+html
+{
+	scroll-behavior: smooth;
+}
+
 #display
 {
 	user-select: none;

@@ -56,6 +56,25 @@ audio{display: none;}
 	height: 2rem;
 	line-height: 2rem;
 	margin-left: 0.5rem;
+	width: calc(100% - var(--sound-inner-button-size) - 0.5rem);
+}
+
+.soundTitleMarquee
+{
+	will-change: scroll-position;
+}
+
+.soundTitleMarquee p
+{
+	margin-right: 5rem;
+}
+
+.soundTitleInner
+{
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	height: 100%;
 }
 
 .soundTitleContainer,.soundTitle

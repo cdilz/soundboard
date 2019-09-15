@@ -14,15 +14,15 @@
 		- [X] Clicking play/pause should start/stop the audio
 		- [X] Pressing a set key should start/stop the audio
 		- [ ] Require button to be held for hold? Currently any key pressed will stop a manual play if it's set to hold
-	- [ ] Title Container
-		- [ ] Title should marquee when too wide
+	- [X] Title Container
+		- [X] Title should marquee when too wide
 	- [X] Button to set the key for this track
 		- [X] Should display something to indicate that you can press it to change the key. Maybe create a keyboard key icon?
 		- [X] Should display the key to use to run this
 	- [X] Icon that lights up to show when shift, ctrl, or alt keys were held with the key. Will probably just use S, C, and A. Can this be language independent?
-	- [ ] Button to indicate that you need to hold the key
+	- [X] Button to indicate that you need to hold the key
 		- [X] Create icon for holding, perhaps a pressed key
-		- [ ] When button is lit you must hold the button to play the audio
+		- [X] When button is lit you must hold the button to play the audio
 	- [ ] Button to indicate that this will loop
 		- [X] Create icon for looping, perhaps an infinity with an arrow in it
 		- [ ] When button is lit the audio will loop (currently working, but I don't have clamping yet so holding off on checking this)
