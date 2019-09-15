@@ -83,16 +83,8 @@ audio{display: none;}
 	overflow: hidden;
 }
 
-.playButton
-{
-	width: var(--sound-inner-button-size);
-	height: var(--sound-inner-button-size);
-}
-
 .controlKey
 {
-	width: var(--sound-inner-button-size);
-	height: var(--sound-inner-button-size);
 	font-size: 200%;
 	line-height: 2.25rem;
 	display: flex;
@@ -114,7 +106,7 @@ audio{display: none;}
 	display: flex;
 	margin-left: calc(2*var(--sound-inner-split-separaton));
 }
-.hold
+.hold,.restart,.playButton,.controlKey,.controlLightsRight
 {
 	width: var(--sound-inner-button-size);
 	height: var(--sound-inner-button-size);
@@ -140,7 +132,6 @@ audio{display: none;}
 }
 .controlLightsRight
 {
-	width: 50%;
 	display: flex;
 	flex-direction: column;
 }

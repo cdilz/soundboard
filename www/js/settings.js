@@ -1,5 +1,10 @@
 const _crypto = require('crypto')
 
+function _lightClass(bool)
+{
+	return bool ? 'lit' : 'unlit'
+}
+
 class Settings
 {
 	constructor(fileName, override = {})
@@ -12,6 +17,7 @@ class Settings
 		this.options.key = override.key || null
 		this.options.hold = override.hold || false
 		this.options.loop = override.loop || false
+		this.options.restart = override.restart || false
 		this.options.volume = override.volume || 1
 		
 		// We force these to be objects so we don't have issues with setting them
@@ -25,7 +31,7 @@ class Settings
 
 		this.options.constrain = {}
 		this.options.constrain.min = override.constrain.min || 0
-		this.options.constrain.max = override.constrain.max || 1
+		this.options.constrain.max = override.constrain.max || infinity
 	}
 
 	get parts()
@@ -44,6 +50,7 @@ class Settings
 			,ctrl: soundContainer.querySelector('.ctrl')
 			,title: soundContainer.querySelector('.soundTitle')
 			,titleInner: soundContainer.querySelector('.soundTitleInner')
+			,restart: soundContainer.querySelector('.restart')
 		}
 	
 		return output
@@ -60,18 +67,19 @@ class Settings
 		let ctrl = this.options.modifier.ctrl || override.ctrl
 		let shift = this.options.modifier.shift || override.shift
 		let alt = this.options.modifier.alt || override.alt
+		
+		parts.ctrl.classList.remove('unlit', 'lit')
+		parts.shift.classList.remove('unlit', 'lit')
+		parts.alt.classList.remove('unlit', 'lit')
 	
 		// If the ctrl key is pressed light it up, otherwise unlight it
-		parts.ctrl.classList.add(ctrl?'lit':'unlit')
-		parts.ctrl.classList.remove(ctrl?'unlit':'lit')
+		parts.ctrl.classList.add(_lightClass(ctrl))
 	
 		// If the shift key is pressed light it up, otherwise unlight it
-		parts.shift.classList.add(shift?'lit':'unlit')
-		parts.shift.classList.remove(shift?'unlit':'lit')
+		parts.shift.classList.add(_lightClass(shift))
 	
 		// If the alt key is pressed light it up, otherwise unlight it
-		parts.alt.classList.add(alt?'lit':'unlit')
-		parts.alt.classList.remove(alt?'unlit':'lit')
+		parts.alt.classList.add(_lightClass(alt))
 	}
 
 	static load(fileName)
@@ -130,20 +138,23 @@ class Settings
 
 	toHTML()
 	{
+		let opts = this.options
+		let mods = opts.modifier
 		let titleHolder = document.createElement('p')
-		titleHolder.append(this.options.fileName)
+		titleHolder.append(opts.fileName)
 		let title = titleHolder.innerHTML
-		let filePath = this.options.filePath.replace("'", "&#39;").replace('"', '&#034;')
+		let filePath = opts.filePath.replace("'", "&#39;").replace('"', '&#034;')
 
-		let shiftLight = this.options.modifier.shift ? 'lit' : 'unlit'
-		let ctrlLight = this.options.modifier.ctrl ? 'lit' : 'unlit'
-		let altLight = this.options.modifier.alt ? 'lit' : 'unlit'
-		let loopLight = this.options.loop ? 'lit' : 'unlit'
-		let loopSetting = this.options.loop ? ' loop' : ''
-		let holdLight = this.options.hold ? 'lit' : 'unlit'
+		let shiftLight = _lightClass(mods.shift)
+		let ctrlLight = _lightClass(mods.ctrl)
+		let altLight = _lightClass(mods.alt)
+		let loopLight = _lightClass(opts.loop)
+		let loopSetting = opts.loop ? ' loop' : ''
+		let holdLight = _lightClass(opts.hold)
+		let restartLight = _lightClass(opts.restart)
 
-		let key = this.options.key ? this.options.key : '?'
-		let keyClass = this.options.key ? ' set' : ''
+		let key = opts.key ? opts.key : '?'
+		let keyClass = opts.key ? ' set' : ''
 
 		let html =
 		`
@@ -174,6 +185,7 @@ class Settings
 							</div>
 							<div class = '${loopLight} controlLight loop soundButton'>${_svg.sound.loop}</div>
 						</div>
+						<div class = '${restartLight} controlLight restart soundButton'>${_svg.sound.restart}</div>
 					</div>
 					<div class = 'seekHolder'>
 					</div>
@@ -195,6 +207,11 @@ class Settings
 		{
 			parts.play.innerHTML = _svg.sound.play
 			parts.audio.pause()
+
+			if(this.options.restart)
+			{
+				parts.audio.currentTime = this.options.constrain.min
+			}
 		}
 	}
 
@@ -217,10 +234,28 @@ class Settings
 		this.save()
 	}
 
+	restartEvent(e)
+	{
+		let parts = this.parts
+		this.options.restart = !this.options.restart
+		parts.restart.classList.toggle('unlit')
+		parts.restart.classList.toggle('lit')
+		parts.audio.restart = !parts.audio.restart
+		this.save()
+	}
+
 	keyEvent(e)
 	{
 		let parts = this.parts
 		parts.key.classList.toggle('waitingForInput')
+	}
+
+	audioEndedEvent(e)
+	{
+		if(this.options.restart)
+		{
+			parts.audio.currentTime = this.options.constrain.min
+		}
 	}
 
 	addEvents()
@@ -229,5 +264,7 @@ class Settings
 		this.parts.hold.addEventListener('click', this.holdEvent.bind(this), false)
 		this.parts.loop.addEventListener('click', this.loopEvent.bind(this), false)
 		this.parts.key.addEventListener('click', this.keyEvent.bind(this), false)
+		this.parts.restart.addEventListener('click', this.restartEvent.bind(this), false)
+		this.parts.audio.addEventListener('ended', this.audioEndedEvent.bind(this), false)
 	}
 }

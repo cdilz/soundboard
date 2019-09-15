@@ -26,7 +26,7 @@
 	- [ ] Button to indicate that this will loop
 		- [X] Create icon for looping, perhaps an infinity with an arrow in it
 		- [ ] When button is lit the audio will loop (currently working, but I don't have clamping yet so holding off on checking this)
-	- [ ] Button to indicate that this will force restart instead of paused (when key pressed again or let go in hold or pause button pressed)
+	- [ ] Button to indicate that this will force restart instead of pausing the track (when key pressed again or let go in hold or pause button pressed)
 		- [ ] Create icon for restart, perhaps a sideways U-turn symbol would work here?
 	- [ ] Volume Control
 		- [ ] Mute Button

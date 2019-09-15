@@ -18,7 +18,7 @@
 	--sound-inner-split-separaton: 0.10rem;
 	--sound-inner-split-height: calc(50% - var(--sound-inner-split-separaton));
 	--sound-inner-button-size: calc((var(--sound-height)/2) - var(--sound-inner-split-separaton));
-	--sound-inner-controls-width: calc(2 * var(--sound-inner-button-size))
+	--sound-inner-controls-width: calc(3*var(--sound-inner-button-size))
 
 
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
