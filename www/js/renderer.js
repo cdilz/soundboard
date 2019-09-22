@@ -169,9 +169,9 @@ document.addEventListener('DOMContentLoaded', () =>
 	
 			// If there is audio waiting for input we don't want to accidentally pause anything
 			if(waitingForInput.length > 0)
-			{		
+			{
 				// We have a few options to clear a key or cancel input
-				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
+				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape' || keypress.latest == ''
 				let clear = e.key == 'Backspace' || e.key == 'Delete'
 
 				// If we're clearing the key run the clear function
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () =>
 						// Adjust keys for the ones that are lifted						
 						setting.lightKeys(keypress.settings)
 						// If lifting a non-modifier key then save it
-						if(!keypress.isKeyPressed)
+						if(!keypress.isKeyPressed && keypress.latest != '')
 						{
 							let parts = setting.parts
 							setting.options.modifier.ctrl = keypress.ctrl

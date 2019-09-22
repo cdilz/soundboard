@@ -67,6 +67,12 @@ class keypress
 				_keypress.latest = _keypress.keys[_keypress.keys.length - 1]
 			}
 		}
+		// If the key length is not 1 and there are no other keys pressed, we want to set it to a non-pressed state
+		else if(_keypress.keys.length == 0)
+		{
+			_keypress.isKeyPressed = false
+			_keypress.latest = ''
+		}
 	}
 
 	static isPressed(alt, ctrl, shift, key)
