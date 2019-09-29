@@ -121,6 +121,12 @@ function _marquee()
 	}
 }
 
+function _setAllClamps()
+{
+	_settings.forEach((setting) => {setting.setMinMaxClamp()}
+	)
+}
+
 document.addEventListener('DOMContentLoaded', () =>
 {
 	document.addEventListener('keydown', (e) =>
@@ -241,6 +247,7 @@ document.addEventListener('DOMContentLoaded', () =>
 	window.addEventListener('resize', (e) =>
 	{
 		_marquee()
+		_setAllClamps()
 	})
 
 	_fs.readdir(_audioDirectory, (err, files) =>
@@ -253,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () =>
 
 		_addFilesToSettings(audioFiles)
 		_marquee()
+		_setAllClamps()
 	})
 })
 

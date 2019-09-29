@@ -31,7 +31,7 @@ class Settings
 
 		this.options.constrain = {}
 		this.options.constrain.min = override.constrain.min || 0
-		this.options.constrain.max = override.constrain.max || infinity
+		this.options.constrain.max = override.constrain.max || 1
 	}
 
 	get parts()
@@ -51,6 +51,9 @@ class Settings
 			,title: soundContainer.querySelector('.soundTitle')
 			,titleInner: soundContainer.querySelector('.soundTitleInner')
 			,restart: soundContainer.querySelector('.restart')
+			,seekBar: soundContainer.querySelector('.seekBar')
+			,seekMin: soundContainer.querySelector('.seekMin')
+			,seekMax: soundContainer.querySelector('.seekMax')
 		}
 	
 		return output
@@ -156,6 +159,10 @@ class Settings
 		let key = opts.key ? opts.key : '?'
 		let keyClass = opts.key ? ' set' : ''
 
+		
+		let progressMin = opts.constrain.min
+		let progressMax = opts.constrain.max
+
 		let html =
 		`
 			<div class = 'soundContainer' id = '${this.id}'>
@@ -188,6 +195,14 @@ class Settings
 						<div class = '${restartLight} controlLight restart soundButton'>${_svg.sound.restart}</div>
 					</div>
 					<div class = 'seekHolder'>
+						<div class = 'seekMin seekClamp'>
+							&nbsp;
+						</div>
+						<div class = 'seekMax seekClamp'>
+							&nbsp;
+						</div>
+						<progress min = '${progressMin}' max = '${progressMax}' value = 0.5 class = 'seekBar'>
+						</progress>
 					</div>
 				</div>
 			</div>
@@ -266,5 +281,15 @@ class Settings
 		this.parts.key.addEventListener('click', this.keyEvent.bind(this), false)
 		this.parts.restart.addEventListener('click', this.restartEvent.bind(this), false)
 		this.parts.audio.addEventListener('ended', this.audioEndedEvent.bind(this), false)
+	}
+
+	setMinMaxClamp()
+	{
+		let seekBarWidth = this.parts.seekBar.offsetWidth
+		let minVal = this.options.constrain.min * seekBarWidth
+		let maxVal = this.options.constrain.max * seekBarWidth
+
+		this.parts.seekMin.style.marginLeft = minVal + 'px'
+		this.parts.seekMax.style.marginLeft = maxVal + 'px'
 	}
 }

@@ -185,3 +185,30 @@ audio{display: none;}
 {
 	color: var(--sound-button-enabled-text);
 }
+
+.seekHolder
+{
+	height: 50%;
+	width: calc(100% - (var(--sound-inner-button-size) * 4));
+	margin-right: 0.5rem;
+	margin-left: 0.5rem;
+}
+
+.seekBar
+{
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 100%;
+}
+
+.seekClamp
+{
+	display: inline-block;
+	transform: translateY(-25%);
+	width: 3px;
+	height: 2rem;
+	background-color: white;
+	position: absolute;
+	cursor: ew-resize;
+}
