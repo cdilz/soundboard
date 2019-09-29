@@ -188,10 +188,12 @@ audio{display: none;}
 
 .seekHolder
 {
-	height: 50%;
+	height: 100%;
 	width: calc(100% - (var(--sound-inner-button-size) * 4));
 	margin-right: 0.5rem;
 	margin-left: 0.5rem;
+	display: flex;
+	align-items: center;
 }
 
 .seekBar
@@ -199,16 +201,41 @@ audio{display: none;}
 	-webkit-appearance: none;
 	appearance: none;
 	width: 100%;
-	height: 100%;
+	height: 50%;
 }
 
-.seekClamp
+.seekClampCover
 {
-	display: inline-block;
-	transform: translateY(-25%);
-	width: 3px;
-	height: 2rem;
-	background-color: white;
+	min-width: 0px;
+	width: calc(100% - 4px);
+	height: 50%;
+	background-color: rgba(255, 0, 234, 0.5)
+}
+
+.seekClampBox
+{
+	min-width: 4px;
+	height: var(--sound-inner-button-size);
+	display: flex;
+	align-items: center;
 	position: absolute;
+}
+
+.seekMinBox
+{
+	justify-content: right;
+}
+
+.seekMaxBox
+{
+	justify-content: left;
+}
+
+.seekClampGrip
+{
+	min-width: 4px;
+	max-width: 4px;
+	height: 1.90rem;
+	background-color: white;
 	cursor: ew-resize;
 }
