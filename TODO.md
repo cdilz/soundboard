@@ -23,14 +23,14 @@
 	- [X] Button to indicate that you need to hold the key
 		- [X] Create icon for holding, perhaps a pressed key
 		- [X] When button is lit you must hold the button to play the audio
-	- [ ] Button to indicate that this will loop
+	- [X] Button to indicate that this will loop
 		- [X] Create icon for looping, perhaps an infinity with an arrow in it
-		- [ ] When button is lit the audio will loop (currently working, but I don't have clamping yet so holding off on checking this)
-	- [ ] Button to indicate that this will force restart instead of pausing the track (when key pressed again or let go in hold or pause button pressed)
-		- [ ] Create icon for restart, perhaps a sideways U-turn symbol would work here?
+		- [X] When button is lit the audio will loop
+	- [X] Button to indicate that this will force restart instead of pausing the track (when key pressed again or let go in hold or pause button pressed)
+		- [X] Create icon for restart, perhaps a sideways U-turn symbol would work here?
 	- [ ] Volume Control
 		- [ ] Mute Button
 	- [ ] Seek Slider
-		- [ ] Click anywhere to seek
-		- [ ] Bars on both end to limit the seeks
+		- [X] Click anywhere to seek
+		- [X] Bars on both end to limit the seeks
 			- [ ] Perhaps a way to force set the hours/minutes/seconds/milliseconds?

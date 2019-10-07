@@ -68,6 +68,21 @@ class Settings
 		return this.parts.key.classList.contains('waitingForInput')
 	}
 
+	get minTime()
+	{
+		return this.parts.audio.duration * this.options.constrain.min
+	}
+
+	get maxTime()
+	{
+		return this.parts.audio.duration * this.options.constrain.max
+	}
+
+	get currentTime()
+	{
+		return this.parts.audio.currentTime / this.parts.audio.duration
+	}
+
 	lightKeys(override = {})
 	{
 		let parts = this.parts
@@ -208,7 +223,7 @@ class Settings
 							</div>
 						</div>
 
-						<progress min = '${progressMin}' max = '${progressMax}' value = 0.5 class = 'seekBar'>
+						<progress draggable = 'true' value = ${progressMin} class = 'seekBar'>
 						</progress>
 						
 						<div class = 'seekMaxBox seekClampBox'>
@@ -231,6 +246,11 @@ class Settings
 		let parts = this.parts
 		if(parts.audio.paused)
 		{
+			if(parts.audio.currentTime < this.minTime)
+			{
+				parts.audio.currentTime = this.minTime
+			}
+
 			parts.play.innerHTML = _svg.sound.pause
 			parts.audio.play()
 		}
@@ -241,7 +261,7 @@ class Settings
 
 			if(this.options.restart)
 			{
-				parts.audio.currentTime = this.options.constrain.min
+				parts.audio.currentTime = this.minTime
 			}
 		}
 	}
@@ -283,54 +303,170 @@ class Settings
 
 	audioEndedEvent(e)
 	{
+		let audio = this.parts.audio
+		let play = this.parts.play
+		
 		if(this.options.restart)
 		{
-			parts.audio.currentTime = this.options.constrain.min
+			audio.currentTime = this.options.constrain.min
 		}
+		else
+		{
+			play.innerHTML = _svg.sound.play
+		}
+	}
+
+	audioTimeUpdateEvent(e)
+	{
+		let parts = this.parts
+		let audio = parts.audio
+		let playButton = parts.play
+		parts.seekBar.value = this.currentTime
+
+		if(audio.currentTime < this.minTime)
+		{
+			audio.currentTime = this.minTime
+		}
+		else if(audio.currentTime >= this.maxTime)
+		{
+			if(audio.loop)
+			{
+				audio.currentTime = this.minTime
+			}
+			else
+			{
+				audio.currentTime = this.maxTime
+				if(audio.currentTime != audio.duration)
+				{
+					playButton.click()
+				}
+			}
+		}
+	}
+
+	gripSetPosition(e, grip)
+	{
+		let currentX = e.pageX
+		let boundLeft = this.parts.seekBar.getClientRects()[0].left
+		let boundRight = this.parts.seekBar.getClientRects()[0].right
+
+		let seekBar = this.parts.seekBar
+
+		let setValue = (currentX - boundLeft) / (boundRight - boundLeft)
+		let isMin = grip == this.parts.seekMinGrip
+		let isMax = grip == this.parts.seekMaxGrip
+
+		if(isMin)
+		{
+			this.options.constrain.min = setValue
+		}
+		else if(isMax)
+		{
+			this.options.constrain.max = setValue
+		}
+
+		if(seekBar.value < this.options.constrain.min)
+		{
+			seekBar.value = this.options.constrain.min
+		}
+		else if(seekBar.value > this.options.constrain.max)
+		{
+			seekBar.value = this.options.constrain.max
+		}
+
+		if(this.options.constrain.min >= this.options.constrain.max)
+		{
+			if(isMin)
+			{
+				this.options.constrain.min = 0
+			}
+			else if(isMax)
+			{
+				this.options.constrain.max = 1
+			}
+		}		
+
+		if(this.options.constrain.min < 0)
+		{
+			this.options.constrain.min = 0
+		}
+		else if(this.options.constrain.max > 1)
+		{
+			this.options.constrain.max = 1
+		}
+
+		this.setMinMaxClamp()
 	}
 
 	gripDragStart(e)
 	{
-		this.clampMove = {}
-		this.clampMove.startY = e.pageY
-		this.clampMove.startX = e.pageX
-		this.clampMove.prevMin = this.options.constrain.min
-		this.clampMove.prevMax = this.options.constrain.max
-		this.clampMove.bounding = this.parts.seekBar.getClientRects()[0]
 		e.dataTransfer.setDragImage(new Image(), 0, 0)
-		//e.preventDefault()
 	}
 
 	gripMinDragEnd(e)
 	{
-		this.gripMinDrag(e)
+		this.gripSetPosition(e, this.parts.seekMinGrip)
 		this.save()
 	}
 
 	gripMinDrag(e)
 	{
-		let currentX = e.pageX
-		let boundLeft = this.clampMove.bounding.left
-		let boundRight = this.clampMove.bounding.right
-
-		this.options.constrain.min = (currentX - boundLeft) / (boundRight - boundLeft)
-		this.setMinMaxClamp()
+		this.gripSetPosition(e, this.parts.seekMinGrip)
 	}
 
 	gripMaxDragEnd(e)
 	{
-		this.gripMaxDrag(e)
+		this.gripSetPosition(e, this.parts.seekMaxGrip)
 		this.save()
 	}
 
 	gripMaxDrag(e)
 	{
-		let currentX = e.pageX
-		let boundLeft = this.clampMove.bounding.left
-		let boundRight = this.clampMove.bounding.right
+		this.gripSetPosition(e, this.parts.seekMaxGrip)
+	}
 
-		this.options.constrain.max = (currentX - boundLeft) / (boundRight - boundLeft)
-		this.setMinMaxClamp()
+	seekBarSetPosition(e)
+	{
+		let currentX = e.pageX
+		let boundLeft = this.parts.seekBar.getClientRects()[0].left
+		let boundRight = this.parts.seekBar.getClientRects()[0].right
+
+		let seekBar = this.parts.seekBar
+		let audio = this.parts.audio
+
+		seekBar.value = (currentX - boundLeft) / (boundRight - boundLeft)
+
+		if(seekBar.value < this.options.constrain.min)
+		{
+			seekBar.value = this.options.constrain.min
+		}
+
+		else if(seekBar.value > this.options.constrain.max)
+		{
+			seekBar.value = this.options.constrain.max
+		}
+
+		audio.currentTime = seekBar.value * audio.duration
+	}
+
+	seekBarClickEvent(e)
+	{
+		this.seekBarSetPosition(e)
+	}
+
+	seekBarDragStartEvent(e)
+	{
+		e.dataTransfer.setDragImage(new Image(), 0, 0)
+	}
+
+	seekBarDragEndEvent(e)
+	{
+		this.seekBarSetPosition(e)
+	}
+
+	seekBarDragEvent(e)
+	{
+		this.seekBarSetPosition(e)
 	}
 
 	addEvents()
@@ -340,7 +476,9 @@ class Settings
 		this.parts.loop.addEventListener('click', this.loopEvent.bind(this), false)
 		this.parts.key.addEventListener('click', this.keyEvent.bind(this), false)
 		this.parts.restart.addEventListener('click', this.restartEvent.bind(this), false)
+		
 		this.parts.audio.addEventListener('ended', this.audioEndedEvent.bind(this), false)
+		this.parts.audio.addEventListener('timeupdate', this.audioTimeUpdateEvent.bind(this), false)
 
 		this.parts.seekMinGrip.addEventListener('dragstart', this.gripDragStart.bind(this), false)
 		this.parts.seekMinGrip.addEventListener('dragend', this.gripMinDragEnd.bind(this), false)
@@ -349,6 +487,11 @@ class Settings
 		this.parts.seekMaxGrip.addEventListener('dragstart', this.gripDragStart.bind(this), false)
 		this.parts.seekMaxGrip.addEventListener('dragend', this.gripMaxDragEnd.bind(this), false)
 		this.parts.seekMaxGrip.addEventListener('drag', this.gripMaxDrag.bind(this), false)
+
+		this.parts.seekBar.addEventListener('click', this.seekBarClickEvent.bind(this), false)
+		this.parts.seekBar.addEventListener('dragstart', this.seekBarDragStartEvent.bind(this), false)
+		this.parts.seekBar.addEventListener('dragend', this.seekBarDragEndEvent.bind(this), false)
+		this.parts.seekBar.addEventListener('drag', this.seekBarDragEvent.bind(this), false)
 	}
 
 	setMinMaxClamp()
@@ -358,7 +501,7 @@ class Settings
 		//if(this.options.constrain.min < 0) {this.options.constrain.min = 0}
 		//else if(this.options.constrain.min > 1) {this.options.constrain.min = 1}
 
-		let minWidth = (this.options.constrain.min* seekBarWidth)
+		let minWidth = (this.options.constrain.min * seekBarWidth)
 		let maxMargin = (this.options.constrain.max * seekBarWidth)
 		let maxWidth = (seekBarWidth - maxMargin)
 

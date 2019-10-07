@@ -18,7 +18,12 @@
 	--sound-inner-split-separaton: 0.10rem;
 	--sound-inner-split-height: calc(50% - var(--sound-inner-split-separaton));
 	--sound-inner-button-size: calc((var(--sound-height)/2) - var(--sound-inner-split-separaton));
-	--sound-inner-controls-width: calc(3*var(--sound-inner-button-size))
+	--sound-inner-controls-width: calc(3*var(--sound-inner-button-size));
+
+	--seek-bar-track-color: rgb(180, 180, 180);
+	--seek-bar-bar-color: rgb(253, 255, 117);
+	--seek-bar-grip-color: rgb(255, 255, 255);
+	--seek-bar-grip-mask-color: rgb(130, 130, 130);
 
 
 	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
