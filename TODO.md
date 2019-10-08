@@ -6,7 +6,7 @@
 	- [X] Add files/folders (multiple files works, can't do both files AND folders)
 	- [ ] Settings?
 - [ ] Audio container
-	- [ ] Delete Button
+	- [X] Delete Button
 	- [ ] Play Speed Modifier
 	- [ ] Play/Pause Button
 		- [X] Create SVG Play Icon

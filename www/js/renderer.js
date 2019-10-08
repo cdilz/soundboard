@@ -127,6 +127,21 @@ function _setAllClamps()
 	)
 }
 
+function _deleteEvent(e)
+{
+	this.delete()
+	let spliced = false
+	for(let i = 0; i < _settings.length; i++)
+	{
+		if(_settings[i] == this)
+		{
+			_settings.splice(i, 1)
+			spliced = true
+			break
+		}
+	}
+}
+
 document.addEventListener('DOMContentLoaded', () =>
 {
 	document.addEventListener('keydown', (e) =>
@@ -261,6 +276,11 @@ document.addEventListener('DOMContentLoaded', () =>
 		_addFilesToSettings(audioFiles)
 		_marquee()
 		_setAllClamps()
+
+		for(let i = 0; i < _settings.length; i++)
+		{
+			_settings[i].parts.delete.addEventListener('click', _deleteEvent.bind(_settings[i]), false)
+		}
 	})
 })
 

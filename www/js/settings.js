@@ -41,6 +41,7 @@ class Settings
 		{
 			 player: soundContainer
 			,audio: soundContainer.querySelector('audio')
+			,delete: soundContainer.querySelector('.delete')
 			,play: soundContainer.querySelector('.playButton')
 			,hold: soundContainer.querySelector('.hold')
 			,loop: soundContainer.querySelector('.loop')
@@ -149,7 +150,24 @@ class Settings
 		{
 			let path = _path.join(_audioSettingsDirectory, this.fileName + '.json')
 			let settings = JSON.stringify(this.options)
-			_fs.writeFile(path, settings, {encoding: 'utf8'}, ()=>{})
+			_fs.writeFile(path, settings, {encoding: 'utf8'}, (e) => {if(e) throw e})
+			return this
+		}
+		catch(e)
+		{
+			throw e
+		}
+	}
+
+	delete()
+	{
+		try
+		{
+			let settingsFile = _path.join(_audioSettingsDirectory, this.fileName + '.json')
+			let audioFile =  _path.join(_audioDirectory, this.fileName)
+			_fs.unlink(settingsFile, (e) => {if(e) throw e})
+			_fs.unlink(audioFile, (e) => {if(e) throw e})
+			this.parts.player.remove()
 			return this
 		}
 		catch(e)
@@ -195,6 +213,9 @@ class Settings
 						<p class = 'soundTitleInner'>
 							${title}
 						</p>
+					</div>
+					<div class = 'soundButton delete'>
+					${_svg.titlebar.close}
 					</div>
 				</div>
 				<div class = 'soundBottom'>

@@ -20,7 +20,7 @@
 	box-sizing: border-box;
 }
 
-.soundButton:not(.playButton) path
+.soundButton:not(.playButton):not(.delete) path
 {
 	stroke-width: 1.5rem;
 }
@@ -51,12 +51,29 @@ audio{display: none;}
 
 .soundBottom{margin-top: var(--sound-inner-split-separaton);}
 
+.delete
+{
+	width: calc(var(--sound-inner-button-size)/2);
+	height: calc(var(--sound-inner-button-size)/2);
+	margin-bottom: calc(var(--sound-inner-button-size)/2);
+}
+
+.delete:hover
+{
+	background-color: var(--titlebar-button-hover-danger);
+}
+
+.delete:hover path
+{
+	stroke: var(--titlebar-button-hover-danger-text);	
+}
+
 .soundTitle
 {
 	height: 2rem;
 	line-height: 2rem;
 	margin-left: 0.5rem;
-	width: calc(100% - var(--sound-inner-button-size) - 0.5rem);
+	width: calc(100% - var(--sound-inner-button-size) - 1rem);
 }
 
 .soundTitleMarquee
