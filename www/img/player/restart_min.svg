@@ -1,6 +1,3 @@
 <svg width="1e3" height="1e3" version="1.1" viewBox="0 0 264.58 264.58" xmlns="http://www.w3.org/2000/svg">
-	<g transform="matrix(.84742 0 0 .84742 19.861 2.3936)" fill="none" stroke="#000001" stroke-miterlimit="2" stroke-width="79.374">
-		<path d="m66.229 106.89c-53.124 42.548-39.637 124.56 17.365 141.89 67.053 24.035 139.18-9.3326 144.53-74.496 3.7568-46.347-31.424-105.08-102.47-99.002" style="paint-order:normal"/>
-		<path d="m96.843 76.535 15.562-9.645 0.57186 18.299z" style="paint-order:normal"/>
-	</g>
+	<path d="m13.229 198.44v52.916h238.12v-185.21h-158.75v-52.916l-79.374 79.374 79.374 79.374v-52.916h105.83v79.374z" fill="none" stroke="#000" stroke-linejoin="round" stroke-width="26.458"/>
 </svg>
