@@ -129,15 +129,18 @@ function _setAllClamps()
 
 function _deleteEvent(e)
 {
-	this.delete()
-	let spliced = false
-	for(let i = 0; i < _settings.length; i++)
+	if(window.confirm(`Are you sure you'd like to delete ${this.fileName}?`))
 	{
-		if(_settings[i] == this)
+		this.delete()
+		let spliced = false
+		for(let i = 0; i < _settings.length; i++)
 		{
-			_settings.splice(i, 1)
-			spliced = true
-			break
+			if(_settings[i] == this)
+			{
+				_settings.splice(i, 1)
+				spliced = true
+				break
+			}
 		}
 	}
 }
