@@ -1,0 +1,26 @@
+.soundContainer
+{
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	background-color: var(--sound-background);
+	color: var(--text-color);
+}
+
+.soundContainer path{stroke: var(--sound-button-hover-text);}
+.soundContainer .fill path{fill: var(--sound-button-hover-text);}
+
+audio{display: none;}
+
+.soundTop,.soundBottom
+{
+	display: flex;
+	flex-direction: row;
+	height: var(--sound-inner-split-height);
+	align-items: center;
+}
+
+.soundTop{margin-bottom: var(--sound-inner-split-separaton);}
+
+.soundBottom{margin-top: var(--sound-inner-split-separaton);}

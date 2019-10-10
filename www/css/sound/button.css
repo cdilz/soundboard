@@ -1,0 +1,33 @@
+.soundButton
+{
+	cursor: pointer;
+	display: flex;
+	align-content: center;
+	justify-content: center;
+	padding: 0.25rem;
+	box-sizing: border-box;
+}
+
+.soundButton:not(.playButton):not(.delete) path
+{
+	stroke-width: 1.5rem;
+}
+
+.soundButton:hover
+{
+	background-color: var(--sound-button-hover);
+	color: var(--sound-button-hover-text);
+}
+.soundButton path{stroke: var(--sound-button-hover-text);}
+.soundButton ellipse{stroke: var(--sound-button-hover-text);}
+.soundButton.fill path{fill: var(--sound-button-hover-text);}
+
+.lit{color: var(--sound-button-enabled-text);}
+.lit path{stroke: var(--sound-button-enabled-text);}
+.lit.fill path{fill: var(--sound-button-enabled-text);}
+
+.hold,.restart,.playButton,.controlKey,.controlLightsRight,.volumeButton
+{
+	width: var(--sound-inner-button-size);
+	height: var(--sound-inner-button-size);
+}

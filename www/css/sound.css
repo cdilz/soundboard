@@ -31,6 +31,7 @@
 	color: var(--sound-button-hover-text);
 }
 .soundButton path{stroke: var(--sound-button-hover-text);}
+.soundButton ellipse{stroke: var(--sound-button-hover-text);}
 .soundButton.fill path{fill: var(--sound-button-hover-text);}
 
 .lit{color: var(--sound-button-enabled-text);}
@@ -100,6 +101,14 @@ audio{display: none;}
 	overflow: hidden;
 }
 
+.volumeContainer
+{
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
 .controlKey
 {
 	font-size: 200%;
@@ -123,7 +132,7 @@ audio{display: none;}
 	display: flex;
 	margin-left: calc(2*var(--sound-inner-split-separaton));
 }
-.hold,.restart,.playButton,.controlKey,.controlLightsRight
+.hold,.restart,.playButton,.controlKey,.controlLightsRight,.volumeButton
 {
 	width: var(--sound-inner-button-size);
 	height: var(--sound-inner-button-size);

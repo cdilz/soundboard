@@ -1,0 +1,34 @@
+/*
+	Container
+*/
+.volumeContainer
+{
+	display: flex;
+	align-items: center;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	width: 10rem;
+}
+
+/*
+	Volume Bar
+*/
+.volumeBar
+{
+	-webkit-appearance: none;
+	appearance: none;
+	width: 100%;
+	height: 50%;
+
+}
+
+.volumeBar::-webkit-progress-bar
+{
+	background-color: var(--seek-bar-track-color);
+}
+
+.volumeBar::-webkit-progress-value
+{
+	background-color: var(--seek-bar-bar-color);
+}

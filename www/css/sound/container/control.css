@@ -1,0 +1,36 @@
+.controlLight
+{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.controlLights
+{
+	width: var(--sound-inner-controls-width);
+	height: var(--sound-inner-button-size);
+	display: flex;
+	margin-left: calc(2*var(--sound-inner-split-separaton));
+}
+
+.controlLightsLeft
+{
+	width: 50%;
+}
+.controlLightsRight
+{
+	display: flex;
+	flex-direction: column;
+}
+.controlLightsTop
+{
+	display:flex;
+	height: 1rem;
+	width: var(--sound-inner-button-size);
+}
+
+.shift,.ctrl,.alt
+{
+	width: 1rem;
+	height: 1rem;
+}

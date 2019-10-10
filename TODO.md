@@ -28,8 +28,8 @@
 		- [X] When button is lit the audio will loop
 	- [X] Button to indicate that this will force restart instead of pausing the track (when key pressed again or let go in hold or pause button pressed)
 		- [X] Create icon for restart, perhaps a sideways U-turn symbol would work here?
-	- [ ] Volume Control
-		- [ ] Mute Button
+	- [X] Volume Control
+		- [X] Mute Button
 	- [ ] Seek Slider
 		- [X] Click anywhere to seek
 		- [X] Bars on both end to limit the seeks

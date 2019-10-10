@@ -1,0 +1,16 @@
+.delete
+{
+	width: calc(var(--sound-inner-button-size)/2);
+	height: calc(var(--sound-inner-button-size)/2);
+	margin-bottom: calc(var(--sound-inner-button-size)/2);
+}
+
+.delete:hover
+{
+	background-color: var(--titlebar-button-hover-danger);
+}
+
+.delete:hover path
+{
+	stroke: var(--titlebar-button-hover-danger-text);	
+}

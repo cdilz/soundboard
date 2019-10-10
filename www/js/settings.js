@@ -59,6 +59,8 @@ class Settings
 			,seekMaxGrip: soundContainer.querySelector('.seekMaxGrip')
 			,seekMinCover: soundContainer.querySelector('.seekMinCover')
 			,seekMaxCover: soundContainer.querySelector('.seekMaxCover')
+			,volumeButton: soundContainer.querySelector('.volumeButton')
+			,volumeBar: soundContainer.querySelector('.volumeBar')
 		}
 	
 		return output
@@ -214,8 +216,15 @@ class Settings
 							${title}
 						</p>
 					</div>
+					<div class = 'volumeContainer'>
+						<div class = 'soundButton volumeButton'>
+							${_svg.sound.volume}
+						</div>
+						<progress draggable = 'true' value = ${this.options.volume} class = 'volumeBar'>
+						</progress>
+					</div>
 					<div class = 'soundButton delete'>
-					${_svg.titlebar.close}
+						${_svg.titlebar.close}
 					</div>
 				</div>
 				<div class = 'soundBottom'>
@@ -265,6 +274,7 @@ class Settings
 	playEvent(e)
 	{
 		let parts = this.parts
+		parts.audio.volume = parts.volumeBar.value
 		if(parts.audio.paused)
 		{
 			if(parts.audio.currentTime < this.minTime)
@@ -368,10 +378,11 @@ class Settings
 	gripSetPosition(e, grip)
 	{
 		let currentX = e.pageX
-		let boundLeft = this.parts.seekBar.getClientRects()[0].left
-		let boundRight = this.parts.seekBar.getClientRects()[0].right
 
 		let seekBar = this.parts.seekBar
+
+		let boundLeft = seekBar.getClientRects()[0].left
+		let boundRight = seekBar.getClientRects()[0].right
 
 		let setValue = (currentX - boundLeft) / (boundRight - boundLeft)
 		let isMin = grip == this.parts.seekMinGrip
@@ -449,11 +460,12 @@ class Settings
 	seekBarSetPosition(e)
 	{
 		let currentX = e.pageX
-		let boundLeft = this.parts.seekBar.getClientRects()[0].left
-		let boundRight = this.parts.seekBar.getClientRects()[0].right
 
 		let seekBar = this.parts.seekBar
 		let audio = this.parts.audio
+
+		let boundLeft = seekBar.getClientRects()[0].left
+		let boundRight = seekBar.getClientRects()[0].right
 
 		seekBar.value = (currentX - boundLeft) / (boundRight - boundLeft)
 
@@ -490,6 +502,73 @@ class Settings
 		this.seekBarSetPosition(e)
 	}
 
+	volumeBarSetPosition(e)
+	{
+		let currentX = e.pageX
+		let volumeBar = this.parts.volumeBar
+		let audio = this.parts.audio
+		
+		if(audio.muted)
+		{
+			this.toggleMute()
+		}
+
+		let boundLeft = volumeBar.getClientRects()[0].left
+		let boundRight = volumeBar.getClientRects()[0].right
+
+		volumeBar.value = (currentX - boundLeft) / (boundRight - boundLeft)
+
+		audio.volume = volumeBar.value
+		this.options.volume = audio.volume
+	}
+
+	volumeBarClickEvent(e)
+	{
+		this.volumeBarSetPosition(e)
+		this.save()
+	}
+
+	volumeBarDragStartEvent(e)
+	{
+		e.dataTransfer.setDragImage(new Image(), 0, 0)
+	}
+
+	volumeBarDragEndEvent(e)
+	{
+		this.volumeBarSetPosition(e)
+		this.save()
+	}
+
+	volumeBarDragEvent(e)
+	{
+		this.volumeBarSetPosition(e)
+		document.body.style.cursor = 'grabbing'
+		e.preventDefault()
+	}
+
+	toggleMute()
+	{
+		let volumeButton = this.parts.volumeButton
+		let audio = this.parts.audio
+
+		volumeButton.classList.toggle('muted')
+		audio.muted = volumeButton.classList.contains('muted')
+
+		if(audio.muted)
+		{
+			volumeButton.innerHTML = _svg.sound.mute
+		}
+		else
+		{
+			volumeButton.innerHTML = _svg.sound.volume
+		}
+	}
+
+	volumeButtonClick(e)
+	{
+		this.toggleMute()
+	}
+
 	addEvents()
 	{
 		this.parts.play.addEventListener('click', this.playEvent.bind(this), false)
@@ -513,6 +592,13 @@ class Settings
 		this.parts.seekBar.addEventListener('dragstart', this.seekBarDragStartEvent.bind(this), false)
 		this.parts.seekBar.addEventListener('dragend', this.seekBarDragEndEvent.bind(this), false)
 		this.parts.seekBar.addEventListener('drag', this.seekBarDragEvent.bind(this), false)
+
+		this.parts.volumeBar.addEventListener('click', this.volumeBarClickEvent.bind(this), false)
+		this.parts.volumeBar.addEventListener('dragstart', this.volumeBarDragStartEvent.bind(this), false)
+		this.parts.volumeBar.addEventListener('dragend', this.volumeBarDragEndEvent.bind(this), false)
+		this.parts.volumeBar.addEventListener('drag', this.volumeBarDragEvent.bind(this), false)
+
+		this.parts.volumeButton.addEventListener('click', this.volumeButtonClick.bind(this), false)
 	}
 
 	setMinMaxClamp()
