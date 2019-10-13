@@ -24,3 +24,5 @@ audio{display: none;}
 .soundTop{margin-bottom: var(--sound-inner-split-separaton);}
 
 .soundBottom{margin-top: var(--sound-inner-split-separaton);}
+
+#display {position: relative;}
