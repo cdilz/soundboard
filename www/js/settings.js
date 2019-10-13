@@ -18,7 +18,8 @@ class Settings
 		this.options.hold = override.hold || false
 		this.options.loop = override.loop || false
 		this.options.restart = override.restart || false
-		this.options.volume = override.volume || 1
+		this.options.volume = 1
+		if(override.volume != null) {this.options.volume = override.volume}
 		
 		// We force these to be objects so we don't have issues with setting them
 		if(override.modifier == null) {override.modifier = {}}
@@ -31,7 +32,8 @@ class Settings
 
 		this.options.constrain = {}
 		this.options.constrain.min = override.constrain.min || 0
-		this.options.constrain.max = override.constrain.max || 1
+		this.options.constrain.max = 1
+		if(override.constrain.max != null) {this.options.constrain.max = override.constrain.max}
 	}
 
 	get parts()
