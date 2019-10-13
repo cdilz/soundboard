@@ -30,18 +30,32 @@ class keypress
 	static get latest() {return _keypress.latest}
 	static get isKeyPressed() {return _keypress.isKeyPressed}
 
+	static clear()
+	{
+		_keypress =
+		{
+			alt: false
+		 ,ctrl: false
+		 ,shift: false
+		 ,keys: []
+		 ,latest: ''
+		 ,isKeyPressed: false
+	 }
+	}
+
 	static keydown(e)
 	{
 		_keypress.ctrl = e.ctrlKey
 		_keypress.alt = e.altKey
 		_keypress.shift = e.shiftKey
+		let key = e.key.toUpperCase()
 
 		// Don't register a key if it's longer than 1 character.
 		// This prevents the modifier keys from showing up.
-		if(e.key.length == 1)
+		if(key.length == 1)
 		{
-			_keypress.keys.push(e.key)
-			_keypress.latest = e.key
+			_keypress.keys.push(key)
+			_keypress.latest = key
 			_keypress.isKeyPressed = true
 		}
 	}
@@ -51,13 +65,15 @@ class keypress
 		_keypress.ctrl = e.ctrlKey
 		_keypress.alt = e.altKey
 		_keypress.shift = e.shiftKey
-		if(e.key.length == 1)
+
+		let key = e.key.toUpperCase()
+		_keypress.keys = _keypress.keys.filter((element) =>
 		{
-			let key = e.key
-			_keypress.keys = _keypress.keys.filter((element) =>
-			{
-				return element != key
-			})
+			return element != key
+		})
+
+		if(key.length == 1)
+		{
 			if(_keypress.keys.length == 0)
 			{
 				_keypress.isKeyPressed = false

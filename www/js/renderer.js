@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () =>
 			if(waitingForInput.length > 0)
 			{
 				// We have a few options to clear a key or cancel input
-				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape' || keypress.latest == ''
+				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
 				let clear = e.key == 'Backspace' || e.key == 'Delete'
 
 				// If we're clearing the key run the clear function
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () =>
 				{
 					waitingForInput.forEach((setting) =>
 					{
-						setting.clear()
+						setting.clearKey()
 					})
 				}
 
@@ -234,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () =>
 							parts.key.innerHTML = setting.options.key
 							parts.key.classList.add('set')
 							parts.key.click()
+							keypress.clear()
 						}
 					})
 				}

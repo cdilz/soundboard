@@ -141,7 +141,7 @@ class Settings
 	}
 
 	// Resets the key entry button and lights to a default state
-	clear()
+	clearKey()
 	{
 		this.options.modifier.alt = false
 		this.options.modifier.ctrl = false
@@ -550,7 +550,6 @@ class Settings
 	volumeBarDragEvent(e)
 	{
 		this.volumeBarSetPosition(e)
-		document.body.style.cursor = 'grabbing'
 		e.preventDefault()
 	}
 
