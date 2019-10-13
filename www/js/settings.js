@@ -89,10 +89,16 @@ class Settings
 	lightKeys(override = {})
 	{
 		let parts = this.parts
-		let ctrl = this.options.modifier.ctrl || override.ctrl
-		let shift = this.options.modifier.shift || override.shift
-		let alt = this.options.modifier.alt || override.alt
-		
+		let ctrl = this.options.modifier.ctrl 
+		if(override.ctrl != null){ctrl = override.ctrl}
+
+		let shift = this.options.modifier.shift
+		if(override.shift != null){shift = override.shift}
+
+		let alt = this.options.modifier.alt
+		if(override.alt != null){alt = override.alt}
+
+
 		parts.ctrl.classList.remove('unlit', 'lit')
 		parts.shift.classList.remove('unlit', 'lit')
 		parts.alt.classList.remove('unlit', 'lit')
