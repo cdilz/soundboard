@@ -20,7 +20,7 @@
 	appearance: none;
 	width: 100%;
 	height: 50%;
-
+	cursor: pointer;
 }
 
 .volumeBar::-webkit-progress-bar

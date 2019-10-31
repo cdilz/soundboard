@@ -438,31 +438,58 @@ class Settings
 		this.setMinMaxClamp()
 	}
 
-	gripDragStart(e)
+	gripMinBeginSlideEvent(e)
 	{
-		e.dataTransfer.setDragImage(new Image(), 0, 0)
+		this.parts.seekMinGrip.onpointermove = this.gripMinSlidingEvent.bind(this)
+		this.parts.seekMinGrip.setPointerCapture(e.pointerId)
+		this.gripSetPosition(e, this.parts.seekMinGrip)
+
+		this.parts.seekMinGrip.style.cursor = 'ew-resize'
+		document.querySelector('html').style.cursor = 'ew-resize'
 	}
 
-	gripMinDragEnd(e)
+	gripMinSlidingEvent(e)
 	{
+		this.gripSetPosition(e, this.parts.seekMinGrip)
+	}
+
+	gripMinEndSlideEvent(e)
+	{
+		this.parts.seekMinGrip.onpointermove = null
+		this.parts.seekMinGrip.releasePointerCapture(e.pointerId)
+
+		this.parts.seekMinGrip.style.cursor = ''
+		document.querySelector('html').style.cursor = ''
+		
 		this.gripSetPosition(e, this.parts.seekMinGrip)
 		this.save()
 	}
 
-	gripMinDrag(e)
+	gripMaxBeginSlideEvent(e)
 	{
-		this.gripSetPosition(e, this.parts.seekMinGrip)
+		this.parts.seekMaxGrip.onpointermove = this.gripMaxSlidingEvent.bind(this)
+		this.parts.seekMaxGrip.setPointerCapture(e.pointerId)
+		this.gripSetPosition(e, this.parts.seekMaxGrip)
+
+		this.parts.seekMaxGrip.style.cursor = 'ew-resize'
+		document.querySelector('html').style.cursor = 'ew-resize'
 	}
 
-	gripMaxDragEnd(e)
+	gripMaxSlidingEvent(e)
 	{
+		this.gripSetPosition(e, this.parts.seekMaxGrip)
+	}
+
+	gripMaxEndSlideEvent(e)
+	{
+		this.parts.seekMaxGrip.onpointermove = null
+		this.parts.seekMaxGrip.releasePointerCapture(e.pointerId)
+
+		this.parts.seekMaxGrip.style.cursor = ''
+		document.querySelector('html').style.cursor = ''
+		
 		this.gripSetPosition(e, this.parts.seekMaxGrip)
 		this.save()
-	}
-
-	gripMaxDrag(e)
-	{
-		this.gripSetPosition(e, this.parts.seekMaxGrip)
 	}
 
 	seekBarSetPosition(e)
@@ -495,18 +522,29 @@ class Settings
 		this.seekBarSetPosition(e)
 	}
 
-	seekBarDragStartEvent(e)
+	seekBarBeginSlideEvent(e)
 	{
-		e.dataTransfer.setDragImage(new Image(), 0, 0)
+		this.parts.seekBar.onpointermove = this.seekBarSlidingEvent.bind(this)
+		this.parts.seekBar.setPointerCapture(e.pointerId)
+		this.seekBarSetPosition(e)
+
+		this.parts.seekBar.style.cursor = 'ew-resize'
+		document.querySelector('html').style.cursor = 'ew-resize'
 	}
 
-	seekBarDragEndEvent(e)
+	seekBarSlidingEvent(e)
 	{
 		this.seekBarSetPosition(e)
 	}
 
-	seekBarDragEvent(e)
+	seekBarEndSlideEvent(e)
 	{
+		this.parts.seekBar.onpointermove = null
+		this.parts.seekBar.releasePointerCapture(e.pointerId)
+
+		this.parts.seekBar.style.cursor = ''
+		document.querySelector('html').style.cursor = ''
+		
 		this.seekBarSetPosition(e)
 	}
 
@@ -536,21 +574,31 @@ class Settings
 		this.save()
 	}
 
-	volumeBarDragStartEvent(e)
+	volumeBeginSlideEvent(e)
 	{
-		e.dataTransfer.setDragImage(new Image(), 0, 0)
+		this.parts.volumeBar.onpointermove = this.volumeSlidingEvent.bind(this)
+		this.parts.volumeBar.setPointerCapture(e.pointerId)
+		this.volumeBarSetPosition(e)
+
+		this.parts.volumeBar.style.cursor = 'ew-resize'
+		document.querySelector('html').style.cursor = 'ew-resize'
 	}
 
-	volumeBarDragEndEvent(e)
+	volumeSlidingEvent(e)
 	{
+		this.volumeBarSetPosition(e)
+	}
+
+	volumeEndSlideEvent(e)
+	{
+		this.parts.volumeBar.onpointermove = null
+		this.parts.volumeBar.releasePointerCapture(e.pointerId)
+
+		this.parts.volumeBar.style.cursor = ''
+		document.querySelector('html').style.cursor = ''
+		
 		this.volumeBarSetPosition(e)
 		this.save()
-	}
-
-	volumeBarDragEvent(e)
-	{
-		this.volumeBarSetPosition(e)
-		e.preventDefault()
 	}
 
 	toggleMute()
@@ -587,23 +635,22 @@ class Settings
 		this.parts.audio.addEventListener('ended', this.audioEndedEvent.bind(this), false)
 		this.parts.audio.addEventListener('timeupdate', this.audioTimeUpdateEvent.bind(this), false)
 
-		this.parts.seekMinGrip.addEventListener('dragstart', this.gripDragStart.bind(this), false)
-		this.parts.seekMinGrip.addEventListener('dragend', this.gripMinDragEnd.bind(this), false)
-		this.parts.seekMinGrip.addEventListener('drag', this.gripMinDrag.bind(this), false)
+		this.parts.seekMinGrip.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
+		this.parts.seekMinGrip.addEventListener('pointerdown', this.gripMinBeginSlideEvent.bind(this), false)
+		this.parts.seekMinGrip.addEventListener('pointerup', this.gripMinEndSlideEvent.bind(this), false)
 
-		this.parts.seekMaxGrip.addEventListener('dragstart', this.gripDragStart.bind(this), false)
-		this.parts.seekMaxGrip.addEventListener('dragend', this.gripMaxDragEnd.bind(this), false)
-		this.parts.seekMaxGrip.addEventListener('drag', this.gripMaxDrag.bind(this), false)
+		this.parts.seekMaxGrip.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
+		this.parts.seekMaxGrip.addEventListener('pointerdown', this.gripMaxBeginSlideEvent.bind(this), false)
+		this.parts.seekMaxGrip.addEventListener('pointerup', this.gripMaxEndSlideEvent.bind(this), false)
 
-		this.parts.seekBar.addEventListener('click', this.seekBarClickEvent.bind(this), false)
-		this.parts.seekBar.addEventListener('dragstart', this.seekBarDragStartEvent.bind(this), false)
-		this.parts.seekBar.addEventListener('dragend', this.seekBarDragEndEvent.bind(this), false)
-		this.parts.seekBar.addEventListener('drag', this.seekBarDragEvent.bind(this), false)
+		this.parts.seekBar.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
+		this.parts.seekBar.addEventListener('pointerdown', this.seekBarBeginSlideEvent.bind(this), false)
+		this.parts.seekBar.addEventListener('pointerup', this.seekBarEndSlideEvent.bind(this), false)
 
 		this.parts.volumeBar.addEventListener('click', this.volumeBarClickEvent.bind(this), false)
-		this.parts.volumeBar.addEventListener('dragstart', this.volumeBarDragStartEvent.bind(this), false)
-		this.parts.volumeBar.addEventListener('dragend', this.volumeBarDragEndEvent.bind(this), false)
-		this.parts.volumeBar.addEventListener('drag', this.volumeBarDragEvent.bind(this), false)
+		this.parts.volumeBar.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
+		this.parts.volumeBar.addEventListener('pointerdown', this.volumeBeginSlideEvent.bind(this), false)
+		this.parts.volumeBar.addEventListener('pointerup', this.volumeEndSlideEvent.bind(this), false)
 
 		this.parts.volumeButton.addEventListener('click', this.volumeButtonClick.bind(this), false)
 	}
