@@ -5,32 +5,11 @@ const _fs = require('fs')
 const _path = require('path')
 const _directory = _path.dirname(process.execPath)
 const _settingsDirectory = _path.join(_directory, 'settings')
-const _audioSettingsDirectory = _path.join(_settingsDirectory, 'audio')
 const _audioDirectory = _path.join(_directory, 'audio')
 let _settings = []
 
 // Set up the settings and audio folders immediately
-_fs.mkdir(_audioSettingsDirectory, {recursive: true}, (err)=>{if(err){alert(err)}})
 _fs.mkdir(_audioDirectory, {recursive: true}, (err)=>{if(err){alert(err)}})
-
-// Sort the _settings array alphabetically by filename
-function _sortSettings()
-{
-	return _settings.sort((setA, setB) =>
-	{
-		const setAFN = setA.fileName.toLowerCase()
-		const setBFN = setB.fileName.toLowerCase()
-		if(setAFN < setBFN)
-		{
-			return -1
-		}
-		else if(setAFN > setBFN)
-		{
-			return 1
-		}
-		return 0
-	})
-}
 
 function _writeToDisplay()
 {
@@ -91,34 +70,6 @@ function _getWaiting()
 	}
 
 	return output
-}
-
-function _marquee()
-{
-	for(let i = 0; i < _settings.length; i++)
-	{
-		let parts = _settings[i].parts
-		let title = parts.title
-		let titleInner = parts.titleInner
-		// Remove all previous dupes in case we don't need to scroll anymore
-		let filler = parts.title.querySelectorAll('.soundTitleInnerDupe')
-		// Remove the marquee to check if the width without margins fits
-		title.classList.remove('soundTitleMarquee')
-		filler.forEach((ele) => {ele.remove()})
-
-		// If the title's content goes outside its bounding box
-		if(title.clientWidth < title.scrollWidth)
-		{
-			title.classList.add('soundTitleMarquee')
-			// Add a duplicate of the track title so we can marquee
-			let dupe = document.createElement('p')
-			dupe.classList.add('soundTitleInnerDupe')
-			dupe.classList.add('soundTitleInner')
-			dupe.innerHTML = titleInner.innerHTML
-
-			title.append(dupe)
-		}
-	}
 }
 
 function _setAllClamps()
@@ -287,30 +238,3 @@ document.addEventListener('DOMContentLoaded', () =>
 		}
 	})
 })
-
-function _marqueeScroll()
-{
-	let marquees = document.querySelectorAll('.soundTitleMarquee')
-	for(let i = 0; i < marquees.length; i++)
-	{
-		let m = marquees[i]
-		let child = m.children[0]
-		let childStyle = getComputedStyle(child)
-		m.scrollBy({left: 1, top: 0})
-
-		// How far the element is scrolled
-		let titleX = m.scrollLeft
-
-		// The width of the child, plus margin
-		let childX = child.offsetWidth + parseInt(childStyle.marginLeft) + parseInt(childStyle.marginRight)
-
-		// If the child is scrolled past the edge of the parent
-		if(childX < titleX)
-		{
-			m.append(child)
-			m.scrollLeft = 0
-		}
-	}
-}
-
-setInterval(_marqueeScroll, 10)

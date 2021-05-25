@@ -103,34 +103,3 @@ class Sound
 		return domParser.parseFromString(html, 'text/html')
 	}
 }
-
-function marquee()
-{
-	let titles = document.querySelectorAll('.soundTitleContainer')
-	
-	/*
-		We're making sure that if the title is too wide we can make it marquee
-		If someone resizes the app this should add/remove marqueeing as necessary
-	*/
-	titles.forEach(title => 
-	{
-		if(title.offsetWidth < title.scrollWidth)
-		{
-			if(!title.classList.contains('marquee'))
-			{
-				title.classList.add('marquee')
-				title.style.width = title.offsetWidth * 2
-			}
-		}
-		else
-		{
-			if(title.classList.contains('marquee'))
-			{
-				title.classList.remove('marquee')
-				title.style.width = null
-			}
-		}
-	})
-}
-
-setInterval(marquee, 1000)
