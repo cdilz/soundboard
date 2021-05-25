@@ -671,3 +671,5 @@ class Settings
 		this.parts.seekMaxBox.style.width = `${maxWidth}px`
 	}
 }
+
+module.exports = Settings

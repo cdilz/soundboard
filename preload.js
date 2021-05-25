@@ -22,7 +22,8 @@ contextBridge.exposeInMainWorld('electron',
     maximize: () => {send('maximizeWindow')},
     unmaximize: () => {send('unmaximizeWindow')},
 		addSong: () => {send('addSong')}
-  }
+  },
+	Settings: require('./main/setting.js')
 })
 
 
