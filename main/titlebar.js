@@ -1,0 +1,51 @@
+const {ipcMain, dialog} = require('electron')
+
+function on(channel, func)
+{
+	ipcMain.on(channel, func)
+}
+
+function init(mainWindow)
+{
+	on('closeWindow', () =>
+	{
+		mainWindow.close()
+	})
+
+	on('minimizeWindow', () =>
+	{
+		mainWindow.minimize()
+	})
+
+	on('maximizeWindow', () =>
+	{
+		mainWindow.maximize()
+	})
+
+	on('unmaximizeWindow', () =>
+	{
+		mainWindow.unmaximize()
+	})
+
+	on('isWindowMaximized', (event) =>
+	{
+		event.returnValue = mainWindow.isMaximized()
+	})
+
+	on('addSong', () =>
+	{
+		let files = dialog.showOpenDialog(mainWindow,
+			{
+				 title: 'Add Songs'
+				,buttonLabel: 'Import'
+				,filters:
+				[
+					 {name: 'Audio', extensions: ['mp3','wav','ogg','m4a','aac','webm','flac']}
+					,{name: 'All Extensions', extensions: ['*']}
+				]
+				,properties: ['multiSelections']
+			})
+	})
+}
+
+module.exports = init

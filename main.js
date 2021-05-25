@@ -18,7 +18,6 @@ function createWindow ()
       frame: false,
       webPreferences: 
       {
-        nodeIntegration: true,
         preload: path.join(__dirname, 'preload.js')
       }
   })
@@ -27,12 +26,7 @@ function createWindow ()
   mainWindow.loadFile('www/index.html')
 
   // Open the DevTools.
-  /*
-  if(process.env.dev == 'true')
-  {
-    mainWindow.webContents.openDevTools()
-  }
-  */
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () 
@@ -42,30 +36,43 @@ function createWindow ()
     // when you should delete the corresponding element.
     mainWindow = null
   })
+  
+  let titlebar = require('./main/titlebar.js')
+  titlebar(mainWindow)
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.whenReady().then(()=>
+{
+  createWindow()
+  
+  // Open the DevTools.
+  mainWindow.webContents.openDevTools()
+
+  app.on('activate', function () 
+  {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) createWindow()
+  })
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () 
 {
-  app.quit()
+  if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('activate', function () {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) createWindow()
-})
-
+// After we've created the web contents, when we get an input
+// then, before doing anything else, check if it's F5 or F12
+// and instead refresh or open dev tools, respectively
 app.on('web-contents-created', function (e, wc) 
 {
   wc.on('before-input-event', function (e, input) 
   {
-    wc.setIgnoreMenuShortcuts(true)
+    //wc.setIgnoreMenuShortcuts(true)
     if(input.key == 'F5')
     {
       mainWindow.reload()
@@ -76,6 +83,3 @@ app.on('web-contents-created', function (e, wc)
     }
   })
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
