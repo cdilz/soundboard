@@ -7,10 +7,6 @@ const global_settings = require('../global_settings.js')
 
 const settings_path = global_settings.settings_path
 
-fs.mkdir(global_settings.settings_path, {recursive: true}, (err)=>{if(err){alert(err)}})
-
-
-
 class Settings_File
 {
 	constructor(file_name, override = {})

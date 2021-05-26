@@ -30,6 +30,10 @@ function _writeToDisplay()
 	}
 }
 
+/*
+	Now in main/settings/settings_handler.js
+	Except for the _writeToDisplay()
+*/
 function _addFilesToSettings(files)
 {
 	for(let i = 0; i < files.length; i++)

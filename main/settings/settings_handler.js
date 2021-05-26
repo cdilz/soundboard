@@ -4,6 +4,8 @@ const fs = require('fs')
 const path = require('path')
 
 const global_settings = require('../global_settings.js')
+const audio_path = global_settings.audio_path
+
 let Settings_File = require('./settings_file.js')
 
 class Settings_Handler
@@ -12,15 +14,20 @@ class Settings_Handler
 
 	static full_load()
 	{
-		fs.readdir(global_settings.audio_path, (err, files) =>
+		try
 		{
+			let files = fs.readdirSync(audio_path)
 			for(let i = 0; i < files.length; i++)
 			{
 				let file = files[i]
 				let file_name = path.basename(file)
-				this.add(file_name)
+				this.add_setting(file_name)
 			}
-		})
+		}
+		catch(e)
+		{
+			throw e
+		}
 	}
 
 	static sort()
@@ -57,21 +64,91 @@ class Settings_Handler
 		return this.settings[get_index(id)]
 	}
 
-	static add(file_name)
+	static audio_exists(file_name)
 	{
-		this.list.push(Settings_File.load(file_name).save())
-		this.sort()
+		try
+		{
+			let files = fs.readdirSync(audio_path)
+			for(let i = 0; i < files.length; i++)
+			{
+				let check_name = path.basename(files[i])
+				if(check_name == file_name)
+				{
+					return true
+				}
+			}
+
+			return false
+		}
+		catch(e)
+		{
+			throw e
+		}
+	}
+
+	// Alias for add_audio
+	static add(file)
+	{
+		try {this.add_audio(file)} catch (e) {throw e}
+	}
+
+	static add_audio(file)
+	{
+		try
+		{
+			let file_name = path.basename(file)
+
+			// If the file doesn't already exist in _audioDirectory, copy file
+			if(!this.audio_exists(file_name))
+			{
+				let audio_file_directory = path.join(audio_path, fileName)
+				fs.copyFileSync(file, audio_file_directory)
+			}
+			// If file is copied or already exists then we should load the settings and then save it to initialize it if it's new
+			this.add_setting(file_name)
+		}
+		catch(e)
+		{
+			throw(e)
+		}
+	}
+
+	static add_setting(file_name)
+	{
+		try
+		{
+			this.list.push(Settings_File.load(file_name).save())
+			this.sort()
+		}
+		catch(e)
+		{
+			throw e
+		}
 	}
 
 	static save(id)
 	{
-		this.get(id).save()
+		try
+		{
+			this.get(id).save()
+		}
+		catch(e)
+		{
+			throw e
+		}
 	}
 
 	static delete(id)
 	{
-		this.get(id).delete()
-		this.settings.splice(i, 1)
+		try
+		{
+			this.get(id).delete()
+			this.settings.splice(i, 1)
+		}
+		catch(e)
+		{
+			throw e
+		}
 	}
 }
 
