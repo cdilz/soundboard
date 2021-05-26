@@ -1,3 +1,4 @@
+const fs = require('fs')
 const path = require('path')
 
 let main_dir = path.dirname(process.execPath)

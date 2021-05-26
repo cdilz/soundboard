@@ -32,7 +32,7 @@ class Settings_Handler
 
 	static sort()
 	{
-		return settings.sort((setA, setB) =>
+		return this.settings.sort((setA, setB) =>
 		{
 			const setAFN = setA.file_name.toLowerCase()
 			const setBFN = setB.file_name.toLowerCase()
@@ -50,7 +50,7 @@ class Settings_Handler
 
 	static get_index(id)
 	{
-		for(let i = 0; i < settings.length; i++)
+		for(let i = 0; i < this.settings.length; i++)
 		{
 			if(this.settings[i].id == id)
 			{
@@ -86,10 +86,19 @@ class Settings_Handler
 		}
 	}
 
-	// Alias for add_audio
-	static add(file)
+	static add(files)
 	{
-		try {this.add_audio(file)} catch (e) {throw e}
+		try
+		{
+			for(let i = 0; i < files.length; i++)
+			{
+				this.add_audio(files[i])
+			}
+		}
+		catch (e)
+		{
+			throw e
+		}
 	}
 
 	static add_audio(file)
@@ -101,7 +110,7 @@ class Settings_Handler
 			// If the file doesn't already exist in _audioDirectory, copy file
 			if(!this.audio_exists(file_name))
 			{
-				let audio_file_directory = path.join(audio_path, fileName)
+				let audio_file_directory = path.join(audio_path, file_name)
 				fs.copyFileSync(file, audio_file_directory)
 			}
 			// If file is copied or already exists then we should load the settings and then save it to initialize it if it's new
@@ -117,7 +126,7 @@ class Settings_Handler
 	{
 		try
 		{
-			this.list.push(Settings_File.load(file_name).save())
+			this.settings.push(Settings_File.load(file_name).save())
 			this.sort()
 		}
 		catch(e)

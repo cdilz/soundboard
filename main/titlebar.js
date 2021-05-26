@@ -1,4 +1,5 @@
 const {ipcMain, dialog} = require('electron')
+const Settings_Handler = require('./settings/settings_handler.js')
 
 function on(channel, func)
 {
@@ -34,7 +35,7 @@ function init(mainWindow)
 
 	on('addSong', () =>
 	{
-		let files = dialog.showOpenDialog(mainWindow,
+		dialog.showOpenDialog(mainWindow,
 			{
 				 title: 'Add Songs'
 				,buttonLabel: 'Import'
@@ -44,7 +45,15 @@ function init(mainWindow)
 					,{name: 'All Extensions', extensions: ['*']}
 				]
 				,properties: ['multiSelections']
-			})
+			}).
+			then(
+				(files) => 
+				{
+					if(!files.canceled)
+					{
+						Settings_Handler.add(files.filePaths)
+					}
+				})
 	})
 }
 

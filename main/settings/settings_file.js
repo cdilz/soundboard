@@ -16,7 +16,7 @@ class Settings_File
 			throw 'file name invalid'
 		}
 		this.file_name = file_name
-		this.id = id ?? 'id_' + crypto.createHash('md5').update(this.file_name).digest('hex') + '_' + Date.now().toString()
+		this.id = override.id ?? 'id_' + crypto.createHash('md5').update(this.file_name).digest('hex') + '_' + Date.now().toString()
 		this.key = override.key ?? null
 		this.hold = override.hold ?? false
 		this.loop = override.loop ?? false
@@ -58,17 +58,17 @@ class Settings_File
 			// Check if there's a settings file for it
 			// 	If there is: create a Settings from that
 			//  If there isn't: create a new Settings from the filename
-			let path = path.join(settings_path, file_name + '.json')
-			if(fs.existsSync(path))
+			let save_path = path.join(settings_path, file_name + '.json')
+			if(fs.existsSync(save_path))
 			{
-				let file = fs.readFileSync(path, {encoding: 'utf8'})
+				let file = fs.readFileSync(save_path, {encoding: 'utf8'})
 				if(file)
 				{
 					let settings = JSON.parse(file) 
-					return new Settings(file_name, settings)
+					return new Settings_File(file_name, settings)
 				}
 			}
-			return new Settings(file_name)
+			return new Settings_File(file_name)
 		}
 		catch(e)
 		{
