@@ -14,20 +14,20 @@ const settings_path = global_settings.settings_path
 class Settings_File
 {
 	/**
-	 * @param {String} file_name - The name of the file 
-	 * @param {Object} override - Overrides for this file's settings
-	 * @param {String} override.key - Key that this file should listen for
+	 * @param {String} file_name - The name of the file.
+	 * @param {Object} override - Overrides for this file's settings.
+	 * @param {String} override.key - Key that this file should listen for.
 	 * @param {Boolean} override.hold - Should Key be held down?
 	 * @param {Boolean} override.loop - Should audio loop?
 	 * @param {Boolean} override.restart - Should audio return to the start, but pause when it's done?
-	 * @param {Number} override.volume - Volume level of this file as percent (0-1)
-	 * @param {Object} override.modifier - Container for modifier keys
+	 * @param {Number} override.volume - Volume level of this file as percent (0-1).
+	 * @param {Object} override.modifier - Container for modifier keys.
 	 * @param {Boolean} override.modifier.alt - Should user hold alt?
 	 * @param {Boolean} override.modifier.ctrl - Should user hold control?
 	 * @param {Boolean} override.modifier.shift - Should user hold shift?
-	 * @param {Object} override.constrain - Container for audio constraints
-	 * @param {Number} override.constrain.min - Minimum value as percent of seek bar (0-1)
-	 * @param {Number} override.constrain.max - Maximum value as percent of seek bar (0-1)
+	 * @param {Object} override.constrain - Container for audio constraints.
+	 * @param {Number} override.constrain.min - Minimum value as percent of seek bar (0-1).
+	 * @param {Number} override.constrain.max - Maximum value as percent of seek bar (0-1).
 	 */
 	constructor(file_name, override = {})
 	{
@@ -60,7 +60,7 @@ class Settings_File
 	/**
 	 * Deletes the file associated with this instance.
 	 * 
-	 * @returns - this
+	 * @returns - this.
 	 */
 
 	async delete()
@@ -81,15 +81,15 @@ class Settings_File
 	 * Loads a file and tries to generate a Settings_File from it.
 	 * 
 	 * @param {String} file_name 
-	 * @returns - A new instance of Settings_File
+	 * @returns - A new instance of Settings_File.
 	 */
 	static async load(file_name)
 	{
 		try
 		{
-			// Check if there's a settings file for it
-			// 	If there is: create a Settings from that
-			//  If there isn't: create a new Settings from the filename
+			// Check if there's a settings file for it.
+			// 	If there is: create a Settings from that.
+			//  If there isn't: create a new Settings from the filename.
 			let save_path = path.join(settings_path, file_name + '.json')
 			if(fs.existsSync(save_path))
 			{
@@ -111,7 +111,7 @@ class Settings_File
 	/**
 	 * Saves the settings file to disk.
 	 * 
-	 * @returns - this
+	 * @returns - this.
 	 */
 	async save()
 	{

@@ -4,15 +4,28 @@ const fs = require('fs')
 const path = require('path')
 
 const global_settings = require('../global_settings.js')
+/**
+ * Path to audio files represented in the global_settings file.
+ */
 const audio_path = global_settings.audio_path
 
 let Settings_File = require('./settings_file.js')
 
+/**
+ * Class to handle all the settings files.
+ */
 class Settings_Handler
 {
+	/**
+	 * Array of all settings files.
+	 */
 	static settings = []
 
-	static full_load()
+	/**
+	 * Loads every file in association with the audio_path.
+	 */
+
+	static async full_load()
 	{
 		try
 		{
@@ -30,6 +43,11 @@ class Settings_Handler
 		}
 	}
 
+	/**
+	 * Sorts the settings array by alphabetical order, ignoring case.
+	 * 
+	 * @returns - The sorted settings array.
+	 */
 	static sort()
 	{
 		return this.settings.sort((setA, setB) =>
@@ -48,6 +66,12 @@ class Settings_Handler
 		})
 	}
 
+	/**
+	 * Gets the index for a specified ID.
+	 * 
+	 * @param {String} id - ID of requested settings file.
+	 * @returns - Index of settings file with ID of id.
+	 */
 	static get_index(id)
 	{
 		for(let i = 0; i < this.settings.length; i++)
@@ -59,12 +83,24 @@ class Settings_Handler
 		}
 	}
 
+	/**
+	 * Get a specific settings file by ID.
+	 * 
+	 * @param {String} id - ID of requested settings file.
+	 * @returns - a Settings_File representing the ID of id.
+	 */
 	static get(id)
 	{
 		return this.settings[get_index(id)]
 	}
 
-	static audio_exists(file_name)
+	/**
+	 * Checks if an audio file exists in the audio_path.
+	 * 
+	 * @param {String} file_name - File name of the audio file.
+	 * @returns - True if file exists, else false.
+	 */
+	static async audio_exists(file_name)
 	{
 		try
 		{
@@ -86,6 +122,11 @@ class Settings_Handler
 		}
 	}
 
+	/**
+	 * Meant to handle files from the file prompt in Electron.
+	 * 
+	 * @param {String[]} files - Array of audio files to add to the system.
+	 */
 	static add(files)
 	{
 		try
@@ -101,7 +142,12 @@ class Settings_Handler
 		}
 	}
 
-	static add_audio(file)
+	/**
+	 * Processes an audio file to add to the system.
+	 * 
+	 * @param {String} file - Audio file to add to the system.
+	 */
+	static async add_audio(file)
 	{
 		try
 		{
@@ -122,6 +168,11 @@ class Settings_Handler
 		}
 	}
 
+	/**
+	 * Saves the audio file to the array, then sorts it.
+	 * 
+	 * @param {String} file_name - File name of the audio file we're saving.
+	 */
 	static add_setting(file_name)
 	{
 		try
@@ -135,6 +186,11 @@ class Settings_Handler
 		}
 	}
 
+	/**
+	 * Saves a Settings_File by ID.
+	 * 
+	 * @param {String} id - ID of settings file to save.
+	 */
 	static save(id)
 	{
 		try
@@ -147,6 +203,11 @@ class Settings_Handler
 		}
 	}
 
+	/**
+	 * Deltes a Settings_File by ID.
+	 * 
+	 * @param {String} id - ID of settings file to delete.
+	 */
 	static delete(id)
 	{
 		try
