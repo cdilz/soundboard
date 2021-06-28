@@ -7,8 +7,28 @@ const global_settings = require('../global_settings.js')
 
 const settings_path = global_settings.settings_path
 
+/**
+ * Class representing the settings file.
+ */
+
 class Settings_File
 {
+	/**
+	 * @param {String} file_name - The name of the file 
+	 * @param {Object} override - Overrides for this file's settings
+	 * @param {String} override.key - Key that this file should listen for
+	 * @param {Boolean} override.hold - Should Key be held down?
+	 * @param {Boolean} override.loop - Should audio loop?
+	 * @param {Boolean} override.restart - Should audio return to the start, but pause when it's done?
+	 * @param {Number} override.volume - Volume level of this file as percent (0-1)
+	 * @param {Object} override.modifier - Container for modifier keys
+	 * @param {Boolean} override.modifier.alt - Should user hold alt?
+	 * @param {Boolean} override.modifier.ctrl - Should user hold control?
+	 * @param {Boolean} override.modifier.shift - Should user hold shift?
+	 * @param {Object} override.constrain - Container for audio constraints
+	 * @param {Number} override.constrain.min - Minimum value as percent of seek bar (0-1)
+	 * @param {Number} override.constrain.max - Maximum value as percent of seek bar (0-1)
+	 */
 	constructor(file_name, override = {})
 	{
 		if(typeof file_name == typeof undefined || file_name == null)
@@ -37,12 +57,18 @@ class Settings_File
 		this.constrain.max = override.constrain.max ?? 1
 	}
 
-	delete()
+	/**
+	 * Deletes the file associated with this instance.
+	 * 
+	 * @returns - this
+	 */
+
+	async delete()
 	{
 		try
 		{
 			let settings_file = path.join(settings_path, this.fileName + '.json')
-			fs.unlink(settings_file, (e) => {if(e) throw e})
+			fs.unlinkSync(settings_file)
 			return this
 		}
 		catch(e)
@@ -51,7 +77,13 @@ class Settings_File
 		}
 	}
 
-	static load(file_name)
+	/**
+	 * Loads a file and tries to generate a Settings_File from it.
+	 * 
+	 * @param {String} file_name 
+	 * @returns - A new instance of Settings_File
+	 */
+	static async load(file_name)
 	{
 		try
 		{
@@ -76,13 +108,18 @@ class Settings_File
 		}
 	}
 
-	save()
+	/**
+	 * Saves the settings file to disk.
+	 * 
+	 * @returns - this
+	 */
+	async save()
 	{
 		try
 		{
 			let save_path = path.join(settings_path, this.file_name + '.json')
 			let settings = JSON.stringify(this)
-			fs.writeFile(save_path, settings, {encoding: 'utf8'}, (e) => {if(e) throw e})
+			fs.writeFileSync(save_path, settings, {encoding: 'utf8'})
 			return this
 		}
 		catch(e)
