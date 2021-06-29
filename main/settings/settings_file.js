@@ -3,6 +3,7 @@
 const crypto = require('crypto')
 const path = require('path')
 const fs = require('fs')
+const Settings_UI = require('./settings_ui.js')
 const global_settings = require('../global_settings.js')
 
 const settings_path = global_settings.settings_path
@@ -126,6 +127,11 @@ class Settings_File
 		{
 			throw e
 		}
+	}
+
+	toHTML()
+	{
+		return Settings_UI.generate_html(this)
 	}
 }
 
