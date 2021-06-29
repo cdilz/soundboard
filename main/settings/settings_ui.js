@@ -33,7 +33,7 @@ class Settings_UI
 		let file_name = settings.file_name.replace("'", "&#39;").replace('"', '&#034;')
 		let file_path = path.join(audio_path, file_name)
 		let loop = this.setting.loop ? ' loop' : ''
-		return `<audio src='${file_path}'${loop}></audio`
+		return `<audio src='${file_path}'${loop} data-id='${settings.id}'></audio`
 	}
 
 	static top(settings)
@@ -47,7 +47,7 @@ class Settings_UI
 
 	static play()
 	{
-		return `<div class='soundButton playButton fill'>${SVG.sound.play}</div>`
+		return `<div class='soundButton playButton fill' data-id='${settings.id}'>${SVG.sound.play}</div>`
 	}
 
 	static title(settings)
@@ -59,14 +59,14 @@ class Settings_UI
 	static volume(settings)
 	{
 		let volume = settings.volume
-		let volume_button = `<div class='soundButton volumeButton'>${SVG.sound.volume}</div>`
-		let volume_bar = `<progress draggable='true' value=${volume} class='volumeBar'></progress>`
+		let volume_button = `<div class='soundButton volumeButton' data-id='${settings.id}'>${SVG.sound.volume}</div>`
+		let volume_bar = `<progress draggable='true' value=${volume} class='volumeBar' data-id='${settings.id}'></progress>`
 		return `<div class='volumeContainer'>${volume_button}${volume_bar}</div>`
 	}
 
 	static delete_button()
 	{
-		return `<div class='soundButton delete'>${SVG.titlebar.delete}</div>`
+		return `<div class='soundButton delete' data-id='${settings.id}'>${SVG.titlebar.delete}</div>`
 	}
 
 	static bottom(settings)
@@ -81,7 +81,7 @@ class Settings_UI
 	{
 		let key = settings.key ?? '?'
 		let key_class = settings.key ? ' set' : ''
-		return `<div class='soundButton controlKey${key_class}'>${key}</div>`
+		return `<div class='soundButton controlKey${key_class}' data-id='${settings.id}'>${key}</div>`
 	}
 
 	static control_lights(settings)
@@ -96,7 +96,7 @@ class Settings_UI
 	static hold(settings)
 	{
 		let light = this.light_class(settings.hold)
-		return `<div class='${light} controlLight hold soundButton'>${SVG.sound.hold}</div>`
+		return `<div class='${light} controlLight hold soundButton' data-id='${settings.id}'>${SVG.sound.hold}</div>`
 	}
 
 	static control_top(settings)
@@ -110,31 +110,31 @@ class Settings_UI
 	static shift(settings)
 	{
 		let light = this.light_class(settings.shift)
-		return `<div class='${light} controlLight shift'>S</div>`
+		return `<div class='${light} controlLight shift' data-id='${settings.id}'>S</div>`
 	}
 
 	static ctrl(settings)
 	{
 		let light = this.light_class(settings.ctrl)
-		return `<div class='${light} controlLight ctrl'>C</div>`
+		return `<div class='${light} controlLight ctrl' data-id='${settings.id}'>C</div>`
 	}
 
 	static alt(settings)
 	{
 		let light = this.light_class(settings.alt)
-		return `<div class='${light} controlLight alt'>A</div>`
+		return `<div class='${light} controlLight alt' data-id='${settings.id}'>A</div>`
 	}
 
 	static loop(settings)
 	{
 		let light = this.light_class(settings.loop)
-		return `<div class='${light} controlLight loop soundButton'>${SVG.sound.loop}</div>`
+		return `<div class='${light} controlLight loop soundButton' data-id='${settings.id}'>${SVG.sound.loop}</div>`
 	}
 
 	static restart(settings)
 	{
 		let light = this.light_class(settings.restart)
-		return `<div class='${light} controlLight restart soundButton'>${SVG.sound.restart}</div>`
+		return `<div class='${light} controlLight restart soundButton' data-id='${settings.id}'>${SVG.sound.restart}</div>`
 	}
 
 	static seek(settings)
@@ -147,18 +147,18 @@ class Settings_UI
 
 	static min_clamp()
 	{
-		return `<div class='seekMinBox seekClampBox'><div class='seekMinCover seekClampCover'>&nbsp;</div><div class='seekMinGrip seekClampGrip' draggable='true'>&nbsp;</div></div>`
+		return `<div class='seekMinBox seekClampBox' data-id='${settings.id}'><div class='seekMinCover seekClampCover' data-id='${settings.id}'>&nbsp;</div><div class='seekMinGrip seekClampGrip' draggable='true' data-id='${settings.id}'>&nbsp;</div></div>`
 	}
 
 	static seek_bar(settings)
 	{
 		let progress = settings.constrain.min
-		return `<progress draggable='true' value=${progress} class='seekBar'></progress>`
+		return `<progress draggable='true' value=${progress} class='seekBar' data-id='${settings.id}'></progress>`
 	}
 
 	static max_clamp()
 	{
-		return `<div class='seekMaxBox seekClampBox'><div class='seekMaxGrip seekClampGrip' draggable='true'>&nbsp;</div><div class='seekMaxCover seekClampCover'>&nbsp;</div></div>`
+		return `<div class='seekMaxBox seekClampBox' data-id='${settings.id}'><div class='seekMaxGrip seekClampGrip' draggable='true' data-id='${settings.id}'>&nbsp;</div><div class='seekMaxCover seekClampCover' data-id='${settings.id}'>&nbsp;</div></div>`
 	}
 }
 
