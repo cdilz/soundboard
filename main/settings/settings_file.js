@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const path = require('path')
 const fs = require('fs')
 const Settings_UI = require('./settings_ui.js')
+const Settings_Event = require('./settings_event.js')
 const global_settings = require('../global_settings.js')
 
 const settings_path = global_settings.settings_path
@@ -132,6 +133,11 @@ class Settings_File
 	toHTML()
 	{
 		return Settings_UI.generate_html(this)
+	}
+
+	set_events()
+	{
+		Settings_Event.set_all(this)
 	}
 }
 
