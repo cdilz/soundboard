@@ -215,6 +215,7 @@ class Settings_Handler
 		{
 			this.get(id).delete()
 			this.settings.splice(i, 1)
+			this.fill_display()
 		}
 		catch(e)
 		{
@@ -222,8 +223,9 @@ class Settings_Handler
 		}
 	}
 
-	static fill_element(display)
+	static fill_display()
 	{
+		let display = document.querySelector('#display')
 		this.sort()
 		display.innerHTML = ''
 		for(let i = 0; i < this.settings.length; i++)
