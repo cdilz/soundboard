@@ -1,16 +1,16 @@
 //let Settings_Handler = require('./settings_handler.js')
-const SVG = require('../svg.js')
-const global_settings = require('../global_settings.js')
+const SVG = electron.svg
+const global_settings = electron.global_settings
 const marquee_settings = global_settings.marquee
 
 class Settings_Event
 {
-	static set_all(settings)
+	static set_all(id)
 	{
-		let sound_container = document.querySelector(`#${this.id}`)
+		let sound_container = document.querySelector(`#${id}`)
 		let parts =
 		{
-			settings
+			id
 			,player: sound_container
 			,audio: sound_container.querySelector('audio')
 			,delete: sound_container.querySelector('.delete')
@@ -83,10 +83,10 @@ class Settings_Event
 		let click_event = (e) =>
 		{
 			let parts = this
-			parts.settings.hold = !parts.settings.hold
+			electron.audio.toggle_hold(this.id)
 			parts.hold.classList.toggle('unlit')
 			parts.hold.classList.toggle('lit')
-			parts.settings.save()
+			electron.audio.save(this.id)
 		}
 
 		parts.hold.addEventListener('click', click_event.bind(parts), false)
@@ -97,10 +97,10 @@ class Settings_Event
 		let click_event = (e) =>
 		{
 			let parts = this
-			parts.settings.restart = !parts.settings.restart
+			electron.audio.toggle_restart(this.id)
 			parts.restart.classList.toggle('unlit')
 			parts.restart.classList.toggle('lit')
-			parts.settings.save()
+			electron.audio.save(this.id)
 		}
 
 		parts.restart.addEventListener('click', click_event.bind(parts), false)
@@ -112,10 +112,10 @@ class Settings_Event
 		let click_event = (e) =>
 		{
 			let parts = this
-			parts.settings.loop = !parts.settings.loop
+			electron.audio.toggle_loop(this.id)
 			parts.loop.classList.toggle('unlit')
 			parts.loop.classList.toggle('lit')
-			parts.settings.save()
+			electron.audio.save(this.id)
 		}
 
 		parts.loop.addEventListener('click', click_event.bind(parts), false)
@@ -123,10 +123,9 @@ class Settings_Event
 
 	static light_keys(parts)
 	{
-		let ctrl = parts.settings.modifier.ctrl 
-		let shift = parts.settings.modifier.shift
-		let alt = parts.settings.modifier.alt
-
+		let ctrl = electron.audio.get_ctrl(parts.id)
+		let shift = electron.audio.get_shift(parts.id)
+		let alt = electron.audio.get_alt(parts.id)
 
 		parts.ctrl.classList.remove('unlit', 'lit')
 		parts.shift.classList.remove('unlit', 'lit')
@@ -143,15 +142,15 @@ class Settings_Event
 	}
 
 	static clear_key(parts)
-	{		
-		parts.settings.modifier.alt = false
-		parts.settings.modifier.ctrl = false
-		parts.settings.modifier.shift = false
+	{
+		electron.audio.set_ctrl(parts.id, false)
+		electron.audio.set_shift(parts.id, false)
+		electron.audio.set_alt(parts.id, false)
 		Settings_Event.light_keys(parts)
-		parts.settings.key = null
+		electron.audio.set_key(parts.id, null)
 		parts.key.innerHTML = '?'
 		parts.key.classList.remove('set')
-		parts.settings.save()
+		electron.audio.save(parts.id)
 	}
 
 	static key_button(parts)
@@ -167,7 +166,9 @@ class Settings_Event
 
 	static grip_set_position(e, grip, parts)
 	{
-		let settings = parts.settings
+		let id = parts.id
+		let min_grip = electron.audio.get_grip_min(id)
+		let max_grip = electron.audio.get_grip_max(id)
 		let currentX = e.pageX
 
 		let seekBar = parts.seekBar
@@ -181,63 +182,69 @@ class Settings_Event
 
 		if(isMin)
 		{
-			settings.constrain.min = setValue
+			electron.audio.set_grip_min(id, setValue)
 		}
 		else if(isMax)
 		{
-			settings.constrain.max = setValue
+			electron.audio.set_grip_max(id, setValue)
 		}
 
-		if(seekBar.value < settings.constrain.min)
+		if(seekBar.value < min_grip)
 		{
-			seekBar.value = settings.constrain.min
+			seekBar.value = min_grip
 		}
-		else if(seekBar.value > settings.constrain.max)
+		else if(seekBar.value > max_grip)
 		{
-			seekBar.value = settings.constrain.max
+			seekBar.value = max_grip
 		}
 
-		if(settings.constrain.min >= settings.constrain.max)
+		if(min_grip >= max_grip)
 		{
 			if(isMin)
 			{
-				settings.constrain.min = 0
+				electron.audio.set_grip_min(id, 0)
 			}
 			else if(isMax)
 			{
-				settings.constrain.max = 1
+				electron.audio.set_grip_max(id, 1)
 			}
 		}		
 
-		if(settings.constrain.min < 0)
+		if(min_grip < 0)
 		{
-			settings.constrain.min = 0
+			electron.audio.set_grip_min(id, 0)
 		}
-		else if(settings.constrain.max > 1)
+		else if(max_grip > 1)
 		{
-			settings.constrain.max = 1
+			electron.audio.set_grip_max(id, 1)
 		}
 
 		let seekBarWidth = parts.seekBar.offsetWidth
 
-		let minWidth = (settings.constrain.min * seekBarWidth)
-		let maxMargin = (settings.constrain.max * seekBarWidth)
+		let minWidth = (min_grip * seekBarWidth)
+		let maxMargin = (max_grip * seekBarWidth)
 		let maxWidth = (seekBarWidth - maxMargin)
 
 		parts.seekMinBox.style.width = `${minWidth}px`
 		parts.seekMaxBox.style.marginLeft = maxMargin + 'px'
 		parts.seekMaxBox.style.width = `${maxWidth}px`
+
+		electron.audio.save(id)
 	}
 
 	static grip_resize(parts)
 	{
+		let id = parts.id
+		let min_grip = electron.audio.get_grip_min(id)
+		let max_grip = electron.audio.get_grip_max(id)
+
 		let seekBarWidth = parts.seekBar.offsetWidth
 
 		//if(this.options.constrain.min < 0) {this.options.constrain.min = 0}
 		//else if(this.options.constrain.min > 1) {this.options.constrain.min = 1}
 
-		let minWidth = (parts.settings.constrain.min * seekBarWidth)
-		let maxMargin = (parts.settings.constrain.max * seekBarWidth)
+		let minWidth = (min_grip * seekBarWidth)
+		let maxMargin = (max_grip * seekBarWidth)
 		let maxWidth = (seekBarWidth - maxMargin)
 
 		parts.seekMinBox.style.width = `${minWidth}px`
@@ -284,7 +291,6 @@ class Settings_Event
 			document.querySelector('html').style.cursor = ''
 			
 			Settings_Event.grip_set_position(e, parts.seekMinGrip)
-			parts.settings.save()
 		}
 
 		let max_end_slide_event = (e) =>
@@ -297,7 +303,6 @@ class Settings_Event
 			document.querySelector('html').style.cursor = ''
 			
 			Settings_Event.grip_set_position(e, parts.seekMaxGrip)
-			parts.settings.save()
 		}
 
 		parts.seekMinGrip.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
@@ -323,7 +328,7 @@ class Settings_Event
 			let parts = this
 			parts.play.innerHTML = SVG.sound.play
 
-			if(parts.settings.restart)
+			if(electron.audio.get_restart(parts.id))
 			{
 				parts.audio.currentTime = Settings_Event.minTime(parts)
 			}
@@ -343,7 +348,7 @@ class Settings_Event
 			}
 			else if(current_time >= max_time)
 			{
-				if(this.settings.loop)
+				if(electron.audio.get_loop(parts.id))
 				{
 					audio.currentTime = min_time
 				}
@@ -360,7 +365,7 @@ class Settings_Event
 		{
 			let parts = this
 			parts.audio.currentTime = min_time
-			if(parts.settings.loop)
+			if(electron.audio.get_loop(parts.id))
 			{
 				parts.audio.play()
 			}
@@ -373,7 +378,9 @@ class Settings_Event
 
 	static seek_bar_set_position(e, parts)
 	{
-		let settings = parts.settings
+		let id = parts.id
+		let min_grip = electron.audio.get_grip_min(id)
+		let max_grip = electron.audio.get_grip_max(id)
 		let currentX = e.pageX
 
 		let seekBar = parts.seekBar
@@ -384,14 +391,14 @@ class Settings_Event
 
 		seekBar.value = (currentX - boundLeft) / (boundRight - boundLeft)
 
-		if(seekBar.value < settings.constrain.min)
+		if(seekBar.value < min_grip)
 		{
-			seekBar.value = settings.constrain.min
+			seekBar.value = min_grip
 		}
 
-		else if(seekBar.value > settings.constrain.max)
+		else if(seekBar.value > max_grip)
 		{
-			seekBar.value = settings.constrain.max
+			seekBar.value = max_grip
 		}
 
 		audio.currentTime = seekBar.value * audio.duration
@@ -448,8 +455,8 @@ class Settings_Event
 		volumeBar.value = (currentX - boundLeft) / (boundRight - boundLeft)
 
 		audio.volume = volumeBar.value
-		parts.settings.volume = audio.Volume
-		parts.settings.save()
+		electron.audio.set_volume(parts.id, audio.volume)
+		electron.audio.save(parts.id)
 	}
 
 	static volume(parts)
@@ -542,7 +549,6 @@ class Settings_Event
 		if(!container.parentElement == null)
 		{
 			let title_outer = parts.title
-			let title_inner = parts.titleInner
 			// Get all duplicate titles then marquee if there are any.
 			let dupes = title_outer.querySelectorAll('.soundeTitleInnerDupe')
 			if(dupes.length > 0)
@@ -579,14 +585,14 @@ class Settings_Event
 	{
 		let click_event = (e) =>
 		{
-			if(window.confirm(`Are you sure you'd like to delete ${this.settings.file_name}?`))
+			let id = this.id
+			let file_name = electron.audio.get_file_name(id)
+			if(window.confirm(`Are you sure you'd like to delete ${file_name}?`))
 			{
-				//Settings_Handler.delete(this.settings.id)
+				electron.audio.delete(id)
 			}
 		}
 
 		parts.delete.addEventListener('click', click_event.bind(parts), false)
 	}
 }
-
-module.exports = Settings_Event

@@ -25,7 +25,6 @@ class Settings_Handler
 	/**
 	 * Loads every file in association with the audio_path.
 	 */
-
 	static async full_load()
 	{
 		try
@@ -103,7 +102,7 @@ class Settings_Handler
 	 */
 	static get(id)
 	{
-		return this.settings[get_index(id)]
+		return this.settings[this.get_index(id)]
 	}
 
 	/**
@@ -236,6 +235,9 @@ class Settings_Handler
 		}
 	}
 
+	/**
+	 * Fills the display (#display) with each setting's HTML.
+	 */
 	static fill_display()
 	{
 		let display = document.querySelector('#display')
@@ -248,6 +250,83 @@ class Settings_Handler
 			setting.set_events()
 		}
 	}
+
+	/**
+	 * Toggle hold on setting with ID of id.
+	 * 
+	 * @param {string} id - ID of setting to modify
+	 */
+	static toggle_hold(id)
+	{
+		let setting = this.get(id)
+		setting.hold = !setting.hold
+	}
+	static get_hold(id){return this.get(id).setting.hold}
+	static set_hold(id, value){this.get(id).setting.hold = value}
+
+	/**
+	 * Toggle restart on setting with ID of id.
+	 * 
+	 * @param {string} id - ID of setting to modify
+	 */
+	static toggle_restart(id)
+	{
+		let setting = this.get(id)
+		setting.restart = !setting.restart
+	}
+	static get_restart(id){return this.get(id).setting.restart}
+	static set_restart(id, value){this.get(id).setting.restart = value}
+
+	/**
+	 * Toggle loop on setting with ID of id.
+	 * 
+	 * @param {string} id - ID of setting to modify
+	 */
+	static toggle_loop(id)
+	{
+		let setting = this.get(id)
+		setting.loop = !setting.loop
+	}
+	static get_loop(id){return this.get(id).setting.loop}
+	static set_loop(id, value){this.get(id).setting.loop = value}
+
+	static toggle_ctrl(id)
+	{
+		let setting = this.get(id)
+		setting.modifier.ctrl = !setting.modifier.ctrl
+	}
+	static get_ctrl(id){return this.get(id).modifier.ctrl}
+	static set_ctrl(id, value){this.get(id).modifier.ctrl = value}
+
+	static toggle_alt(id)
+	{
+		let setting = this.get(id)
+		setting.modifier.alt = !setting.modifier.alt
+	}
+	static get_alt(id){return this.get(id).modifier.alt}
+	static set_alt(id, value){this.get(id).modifier.alt = value}
+
+	static toggle_shift(id)
+	{
+		let setting = this.get(id)
+		setting.modifier.shift = !setting.modifier.shift
+	}
+	static get_shift(id){return this.get(id).modifier.shift}
+	static set_shift(id, value){this.get(id).modifier.shift = value}
+
+	static get_key(id){return this.get(id).key}
+	static set_key(id, value){this.get(id).key = value}
+
+	static get_grip_min(id){return this.get(id).constrain.min}
+	static set_grip_min(id, value){this.get(id).constrain.min = value}
+
+	static get_grip_max(id){return this.get(id).constrain.max}
+	static set_grip_max(id, value){this.get(id).constrain.max = value}
+
+	static get_volume(id){return this.get(id).volume}
+	static set_volume(id, value){this.get(id).volume = value}
+
+	static get_file_name(id){return this.get(id).file_name}
 }
 
 module.exports = Settings_Handler

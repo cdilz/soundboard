@@ -30,6 +30,9 @@ document.addEventListener('DOMContentLoaded', () =>
 	add.addEventListener('click', async e =>
 	{
 		let ids = await electron.window.addSong()
-		alert(ids)
+		for(let i = 0; i < ids.length; i++)
+		{
+			Settings_Event.set_all(ids[i])
+		}
 	})
 })
