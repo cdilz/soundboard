@@ -1,5 +1,6 @@
 'use strict'
 
+const { settings } = require('cluster')
 const fs = require('fs')
 const path = require('path')
 
@@ -218,6 +219,18 @@ class Settings_Handler
 		catch(e)
 		{
 			throw e
+		}
+	}
+
+	static fill_element(display)
+	{
+		this.sort()
+		display.innerHTML = ''
+		for(let i = 0; i < this.settings.length; i++)
+		{
+			let setting = this.settings[i]
+			display.innerHTML += setting.toHTML()
+			setting.set_events()
 		}
 	}
 }
