@@ -1,8 +1,6 @@
-let Settings_Handler = require('./settings_handler.js')
+//let Settings_Handler = require('./settings_handler.js')
 const SVG = require('../svg.js')
 const global_settings = require('../global_settings.js')
-const { desktopCapturer } = require('electron')
-const { marquee } = require('../global_settings.js')
 const marquee_settings = global_settings.marquee
 
 class Settings_Event
@@ -231,6 +229,24 @@ class Settings_Event
 		parts.seekMaxBox.style.width = `${maxWidth}px`
 	}
 
+	static grip_resize(parts)
+	{
+		let seekBarWidth = parts.seekBar.offsetWidth
+
+		//if(this.options.constrain.min < 0) {this.options.constrain.min = 0}
+		//else if(this.options.constrain.min > 1) {this.options.constrain.min = 1}
+
+		let minWidth = (parts.settings.constrain.min * seekBarWidth)
+		let maxMargin = (parts.settings.constrain.max * seekBarWidth)
+		let maxWidth = (seekBarWidth - maxMargin)
+
+		parts.seekMinBox.style.width = `${minWidth}px`
+		parts.seekMaxBox.style.marginLeft = maxMargin + 'px'
+		parts.seekMaxBox.style.width = `${maxWidth}px`
+
+		setInterval(this.grip_resize.bind(this, parts),global_settings.grip_interval)
+	}
+
 	static grips(parts)
 	{
 		let min_sliding_event = (e) => {Settings_Event.gripSetPosition(e, this.seekMinGrip, this)}
@@ -291,6 +307,8 @@ class Settings_Event
 		parts.seekMaxGrip.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
 		parts.seekMaxGrip.addEventListener('pointerdown', max_begin_slide_event.bind(parts), false)
 		parts.seekMaxGrip.addEventListener('pointerup', max_end_slide_event.bind(parts), false)
+
+		this.grip_resize(parts)
 	}
 
 	static audio(parts)
@@ -559,12 +577,11 @@ class Settings_Event
 
 	static delete(parts)
 	{
-		let parts = this
 		let click_event = (e) =>
 		{
 			if(window.confirm(`Are you sure you'd like to delete ${this.settings.file_name}?`))
 			{
-				Settings_Handler.delete(this.settings.id)
+				//Settings_Handler.delete(this.settings.id)
 			}
 		}
 

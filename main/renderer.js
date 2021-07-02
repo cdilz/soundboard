@@ -11,55 +11,7 @@ let _settings = []
 // Set up the settings and audio folders immediately
 _fs.mkdir(_audioDirectory, {recursive: true}, (err)=>{if(err){alert(err)}})
 
-function _writeToDisplay()
-{
-	// Sort display here before writing
-	_sortSettings()
 
-	let display = document.querySelector('#display')
-	display.innerHTML = ''
-	for(let i = 0; i < _settings.length; i++)
-	{
-		let setting = _settings[i]
-		display.innerHTML += setting.toHTML()
-	}
-	for(let i = 0; i < _settings.length; i++)
-	{
-		let setting = _settings[i]
-		setting.addEvents()
-	}
-}
-
-/*
-	Now in main/settings/settings_handler.js
-	Except for the _writeToDisplay()
-*/
-function _addFilesToSettings(files)
-{
-	for(let i = 0; i < files.length; i++)
-	{
-		let file = files[i]
-		let fileName = _path.basename(file)
-		try
-		{
-			let audioDirectory = _path.join(_audioDirectory, fileName)
-			// If the file doesn't already exist in _audioDirectory, copy file
-			if(file != audioDirectory)
-			{
-				_fs.copyFileSync(file, audioDirectory)
-			}
-			// If file is copied or already exists then we should load the settings and then save it to initialize it if it's new
-			let setting = Settings.load(fileName).save()
-			_settings.push(setting)
-		}
-		catch(e)
-		{
-			alert(e)
-		}
-	}
-	// Write the newly added settings to the display
-	_writeToDisplay()
-}
 
 function _getWaiting()
 {
@@ -74,30 +26,6 @@ function _getWaiting()
 	}
 
 	return output
-}
-
-function _setAllClamps()
-{
-	_settings.forEach((setting) => {setting.setMinMaxClamp()}
-	)
-}
-
-function _deleteEvent(e)
-{
-	if(window.confirm(`Are you sure you'd like to delete ${this.fileName}?`))
-	{
-		this.delete()
-		let spliced = false
-		for(let i = 0; i < _settings.length; i++)
-		{
-			if(_settings[i] == this)
-			{
-				_settings.splice(i, 1)
-				spliced = true
-				break
-			}
-		}
-	}
 }
 
 document.addEventListener('DOMContentLoaded', () =>
@@ -218,12 +146,6 @@ document.addEventListener('DOMContentLoaded', () =>
 		}
 	})
 
-	window.addEventListener('resize', (e) =>
-	{
-		_marquee()
-		_setAllClamps()
-	})
-
 	_fs.readdir(_audioDirectory, (err, files) =>
 	{
 		let audioFiles = []
@@ -233,12 +155,5 @@ document.addEventListener('DOMContentLoaded', () =>
 		}
 
 		_addFilesToSettings(audioFiles)
-		_marquee()
-		_setAllClamps()
-
-		for(let i = 0; i < _settings.length; i++)
-		{
-			_settings[i].parts.delete.addEventListener('click', _deleteEvent.bind(_settings[i]), false)
-		}
 	})
 })

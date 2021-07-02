@@ -13,6 +13,7 @@ module.exports =
 {
 	settings_path,
 	audio_path,
+	grip_interval: 10,
 	marquee:
 	{
 		scroll:

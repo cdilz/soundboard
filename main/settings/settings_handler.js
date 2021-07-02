@@ -179,7 +179,12 @@ class Settings_Handler
 	{
 		try
 		{
-			this.settings.push(Settings_File.load(file_name).save())
+			Settings_File.load(file_name)
+			.then((setting) =>
+			{
+				setting.save()
+				this.settings.push(setting)
+			})
 		}
 		catch(e)
 		{
