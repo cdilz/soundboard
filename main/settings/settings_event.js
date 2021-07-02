@@ -1,5 +1,9 @@
 let Settings_Handler = require('./settings_handler.js')
 const SVG = require('../svg.js')
+const global_settings = require('../global_settings.js')
+const { desktopCapturer } = require('electron')
+const { marquee } = require('../global_settings.js')
+const marquee_settings = global_settings.marquee
 
 class Settings_Event
 {
@@ -41,6 +45,7 @@ class Settings_Event
 		this.grips(parts)
 		this.audio(parts)
 		this.seek_bar(parts)
+		this.title(parts)
 	}
 
 	static is_waiting_for_input(parts)
@@ -482,6 +487,74 @@ class Settings_Event
 		parts.volumeBar.addEventListener('pointerup', end_slide_event.bind(parts), false)
 
 		parts.volumeButton.addEventListener('click', mute_click_event.bind(parts), false)
+	}
+
+	static title_duplicate(parts)
+	{
+		let title_outer = parts.title
+		let title_inner = parts.title_inner
+		let dupes = title_outer.querySelectorAll('.soundeTitleInnerDupe')
+		// The outer title's content goes outside its bounding box.
+		if(title_outer.clientWidth < title_outer.scrollWidth)
+		{
+			if(dupes.length == 0)
+			{
+				title_outer.classList.add('soundTitleMarquee')
+				// Add a duplicate to marquee.
+				let dupe = document.createElement('p')
+				dupe.classList.add('soundTitleInnerDupe')
+				dupe.classList.add('soundTitleInner')
+				dupe.innerHTML = title_inner.innerHTML
+				title_outer.append(dupe)
+			}
+		}
+		else
+		{
+			title_outer.classList.remove('soundTitleMarquee')
+			// Delete the duplicates used for marqueeing.
+			dupes.forEach((ele) => {ele.remove()})
+		}
+	}
+
+	static title(parts)
+	{
+		this.title_duplicate(parts)
+		let container = parts.player
+		// Check if the player is still on the board to prevent a potential memory leak.
+		if(!container.parentElement == null)
+		{
+			let title_outer = parts.title
+			let title_inner = parts.titleInner
+			// Get all duplicate titles then marquee if there are any.
+			let dupes = title_outer.querySelectorAll('.soundeTitleInnerDupe')
+			if(dupes.length > 0)
+			{
+				let scroll_settings = marquee_settings.scroll
+				// Instead of using title_inner here we might have the duplicate.
+				let child = title_outer.children[0]
+				let child_style = getComputedStyle(child)
+
+				// Scroll the outer title using what the settings state.
+				title_outer.scrollBy({left: scroll_settings.left, top: scroll_settings.top, behavior: scroll_settings.behavior})
+
+				// Get how far the title is scrolled left.
+				let title_x = title_outer.scrollLeft
+
+				// Get the width of the child, plus margin.
+				let child_x = child.offsetWidth + parseInt(child_style.marginLeft) + parseInt(child_style.marginRight)
+
+				// If the child is scrolled past the edge of the parent, put the child to
+				// the end and scroll back to the start.
+				if(child_x < title_x)
+				{
+					title_outer.append(child)
+					title_outer.scrollLeft = 0
+				}
+			}
+
+			// Run this function again after interval settings.
+			setTimeout(this.title.bind(this, parts), marquee_settings.scroll.interval)
+		}		
 	}
 }
 

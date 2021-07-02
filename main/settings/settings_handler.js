@@ -204,7 +204,7 @@ class Settings_Handler
 	}
 
 	/**
-	 * Deltes a Settings_File by ID.
+	 * Deletes a Settings_File by ID.
 	 * 
 	 * @param {String} id - ID of settings file to delete.
 	 */

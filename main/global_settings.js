@@ -12,5 +12,19 @@ fs.mkdir(audio_path, {recursive: true}, (err)=>{if(err){alert(err)}})
 module.exports =
 {
 	settings_path,
-	audio_path
+	audio_path,
+	marquee:
+	{
+		scroll:
+		{
+			// How often the marquee will scroll in milliseconds
+			interval: 10,
+			// How many pixels left to scroll
+			left: 1,
+			// How many pixels up to scroll?
+			top: 0,
+			// What type of scrolling to use 'smooth' vs 'auto' (jump)
+			behavior: 'smooth'
+		}
+	}
 }
