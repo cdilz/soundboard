@@ -1,8 +1,9 @@
 // All of the Node.js APIs are available in the preload process.
 // It has the same sandbox as a Chrome extension.
 const {ipcRenderer, contextBridge} = require('electron')
+let SVG = require('./main/svg.js')
 let global_settings = require('./main/global_settings.js')
-//const Settings = require('./main/setting.js')
+let Settings_Handler = require('./main/settings/settings_handler.js')
 
 function send(channel, ...args)
 {
@@ -23,12 +24,17 @@ contextBridge.exposeInMainWorld('electron',
     minimize: () => {send('minimizeWindow')},
     maximize: () => {send('maximizeWindow')},
     unmaximize: () => {send('unmaximizeWindow')},
-		addSong: () => {send('addSong')}
+		addSong: () => 
+    {
+      let files = sendSync('addSong')
+      Settings_Handler.add(files)
+    }
   },
   global_settings,
+  svg: SVG,
   audio:
   {
-    
+    get: (id) => {return Settings_Handler.get(id)}
   }
 	//Settings_Handler: Settings_Handler
   //_sortSettings: require()

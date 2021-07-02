@@ -33,27 +33,31 @@ function init(mainWindow)
 		event.returnValue = mainWindow.isMaximized()
 	})
 
-	on('addSong', () =>
+	on('addSong', (event) =>
 	{
-		dialog.showOpenDialog(mainWindow,
-			{
-				 title: 'Add Songs'
-				,buttonLabel: 'Import'
-				,filters:
-				[
-					 {name: 'Audio', extensions: ['mp3','wav','ogg','m4a','aac','webm','flac']}
-					,{name: 'All Extensions', extensions: ['*']}
-				]
-				,properties: ['multiSelections']
-			}).
-			then(
-				(files) => 
+		try
+		{
+			let files = dialog.showOpenDialogSync(mainWindow,
 				{
-					if(!files.canceled)
-					{
-						Settings_Handler.add(files.filePaths)
-					}
+					 title: 'Add Songs'
+					,buttonLabel: 'Import'
+					,filters:
+					[
+						 {name: 'Audio', extensions: ['mp3','wav','ogg','m4a','aac','webm','flac']}
+						,{name: 'All Extensions', extensions: ['*']}
+					]
+					,properties: ['multiSelections']
 				})
+	
+			if(!files.canceled)
+			{
+				event.returnValue = files
+			}
+		}
+		catch(e)
+		{
+			event.returnValue = undefined
+		}
 	})
 }
 

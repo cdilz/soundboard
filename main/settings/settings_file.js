@@ -137,7 +137,7 @@ class Settings_File
 
 	set_events()
 	{
-		Settings_Event.set_all(this)
+		//Settings_Event.set_all(this)
 	}
 }
 

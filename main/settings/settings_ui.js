@@ -19,7 +19,7 @@ class Settings_UI
 		let audio = this.audio(settings)
 		let top = this.top(settings)
 		let bottom = this.bottom(settings)
-		return `<div class='soundContainer' id='${settings.id}>${audio}${top}${bottom}</div>`
+		return `<div class='soundContainer' id='${settings.id}'>${audio}${top}${bottom}</div>`
 	}
 
 	static light_class(bool)
@@ -32,20 +32,20 @@ class Settings_UI
 		// String santization for file names.
 		let file_name = settings.file_name.replace("'", "&#39;").replace('"', '&#034;')
 		let file_path = path.join(audio_path, file_name)
-		let loop = this.setting.loop ? ' loop' : ''
-		return `<audio src='${file_path}'${loop} data-id='${settings.id}'></audio`
+		let loop = settings.loop ? ' loop' : ''
+		return `<audio src='${file_path}'${loop} data-id='${settings.id}'></audio>`
 	}
 
 	static top(settings)
 	{
-		let play = this.play()
+		let play = this.play(settings)
 		let title = this.title(settings)
 		let volume = this.volume(settings)
-		let delete_button = this.delete_button()
+		let delete_button = this.delete_button(settings)
 		return `<div class = 'soundTop'>${play}${title}${volume}${delete_button}</div>`
 	}
 
-	static play()
+	static play(settings)
 	{
 		return `<div class='soundButton playButton fill' data-id='${settings.id}'>${SVG.sound.play}</div>`
 	}
@@ -53,7 +53,7 @@ class Settings_UI
 	static title(settings)
 	{
 		let title = settings.file_name
-		return `<div class = 'soundTitle'><p class = 'soundTitleInner'>${title}</p></div>`
+		return `<div class='soundTitle'><p class='soundTitleInner'>${title}</p></div>`
 	}
 
 	static volume(settings)
@@ -64,9 +64,9 @@ class Settings_UI
 		return `<div class='volumeContainer'>${volume_button}${volume_bar}</div>`
 	}
 
-	static delete_button()
+	static delete_button(settings)
 	{
-		return `<div class='soundButton delete' data-id='${settings.id}'>${SVG.titlebar.delete}</div>`
+		return `<div class='soundButton delete' data-id='${settings.id}'>${SVG.titlebar.close}</div>`
 	}
 
 	static bottom(settings)
@@ -74,7 +74,7 @@ class Settings_UI
 		let key = this.key(settings)
 		let control_lights = this.control_lights(settings)
 		let seek = this.seek(settings)
-		return `<div class='soundBottom'>${key}${control_lights}${seek}<div>`
+		return `<div class='soundBottom'>${key}${control_lights}${seek}</div>`
 	}
 
 	static key(settings)
@@ -139,13 +139,13 @@ class Settings_UI
 
 	static seek(settings)
 	{
-		let min_clamp = this.min_clamp()
+		let min_clamp = this.min_clamp(settings)
 		let seek_bar = this.seek_bar(settings)
-		let max_clamp = this.max_clamp()
+		let max_clamp = this.max_clamp(settings)
 		return `<div class='seekHolder'>${min_clamp}${seek_bar}${max_clamp}</div>`
 	}
 
-	static min_clamp()
+	static min_clamp(settings)
 	{
 		return `<div class='seekMinBox seekClampBox' data-id='${settings.id}'><div class='seekMinCover seekClampCover' data-id='${settings.id}'>&nbsp;</div><div class='seekMinGrip seekClampGrip' draggable='true' data-id='${settings.id}'>&nbsp;</div></div>`
 	}
@@ -156,7 +156,7 @@ class Settings_UI
 		return `<progress draggable='true' value=${progress} class='seekBar' data-id='${settings.id}'></progress>`
 	}
 
-	static max_clamp()
+	static max_clamp(settings)
 	{
 		return `<div class='seekMaxBox seekClampBox' data-id='${settings.id}'><div class='seekMaxGrip seekClampGrip' draggable='true' data-id='${settings.id}'>&nbsp;</div><div class='seekMaxCover seekClampCover' data-id='${settings.id}'>&nbsp;</div></div>`
 	}

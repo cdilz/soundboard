@@ -7,7 +7,7 @@ class Settings_Event
 {
 	static set_all(settings)
 	{
-		let sound_container = document.querySelector(`#${settings.id}`)
+		let sound_container = document.querySelector(`#${this.id}`)
 		let parts =
 		{
 			settings

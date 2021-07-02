@@ -128,15 +128,16 @@ class Settings_Handler
 	 * 
 	 * @param {String[]} files - Array of audio files to add to the system.
 	 */
-	static add(files)
+	static async add(files)
 	{
 		try
 		{
 			for(let i = 0; i < files.length; i++)
 			{
-				this.add_audio(files[i])
+				await this.add_audio(files[i])
 			}
-			this.fill_display()
+			console.log(this.settings.length)
+			await this.fill_display()
 		}
 		catch (e)
 		{
@@ -175,16 +176,13 @@ class Settings_Handler
 	 * 
 	 * @param {String} file_name - File name of the audio file we're saving.
 	 */
-	static add_setting(file_name)
+	static async add_setting(file_name)
 	{
 		try
 		{
-			Settings_File.load(file_name)
-			.then((setting) =>
-			{
-				setting.save()
-				this.settings.push(setting)
-			})
+			let setting = await Settings_File.load(file_name)
+			setting.save()
+			this.settings.push(setting)
 		}
 		catch(e)
 		{

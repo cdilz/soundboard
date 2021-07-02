@@ -29,6 +29,6 @@ document.addEventListener('DOMContentLoaded', () =>
 
 	add.addEventListener('click', e =>
 	{
-		electron.window.addSong()		
+		electron.window.addSong()
 	})
 })
