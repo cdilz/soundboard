@@ -136,6 +136,7 @@ class Settings_Handler
 			{
 				this.add_audio(files[i])
 			}
+			this.fill_display()
 		}
 		catch (e)
 		{
@@ -170,7 +171,7 @@ class Settings_Handler
 	}
 
 	/**
-	 * Saves the audio file to the array, then sorts it.
+	 * Saves the audio file to the array.
 	 * 
 	 * @param {String} file_name - File name of the audio file we're saving.
 	 */
@@ -179,7 +180,6 @@ class Settings_Handler
 		try
 		{
 			this.settings.push(Settings_File.load(file_name).save())
-			this.sort()
 		}
 		catch(e)
 		{

@@ -556,6 +556,20 @@ class Settings_Event
 			setTimeout(this.title.bind(this, parts), marquee_settings.scroll.interval)
 		}		
 	}
+
+	static delete(parts)
+	{
+		let parts = this
+		let click_event = (e) =>
+		{
+			if(window.confirm(`Are you sure you'd like to delete ${this.settings.file_name}?`))
+			{
+				Settings_Handler.delete(this.settings.id)
+			}
+		}
+
+		parts.delete.addEventListener('click', click_event.bind(parts), false)
+	}
 }
 
 module.exports = Settings_Event
