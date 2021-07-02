@@ -35,13 +35,24 @@ class Settings_Handler
 			{
 				let file = files[i]
 				let file_name = path.basename(file)
-				this.add_setting(file_name)
+				await this.add_setting(file_name)
 			}
+			await this.fill_display()
 		}
 		catch(e)
 		{
 			throw e
 		}
+	}
+
+	static get_ids()
+	{
+		let output = []
+		for(let i = 0; i < this.settings.length; i++)
+		{
+			output.push(this.settings[i].id)
+		}
+		return output
 	}
 
 	/**
@@ -136,7 +147,6 @@ class Settings_Handler
 			{
 				await this.add_audio(files[i])
 			}
-			console.log(this.settings.length)
 			await this.fill_display()
 		}
 		catch (e)
@@ -157,7 +167,7 @@ class Settings_Handler
 			let file_name = path.basename(file)
 
 			// If the file doesn't already exist in _audioDirectory, copy file
-			if(!this.audio_exists(file_name))
+			if(!(await this.audio_exists(file_name)))
 			{
 				let audio_file_directory = path.join(audio_path, file_name)
 				fs.copyFileSync(file, audio_file_directory)

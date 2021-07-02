@@ -24,10 +24,11 @@ contextBridge.exposeInMainWorld('electron',
     minimize: () => {send('minimizeWindow')},
     maximize: () => {send('maximizeWindow')},
     unmaximize: () => {send('unmaximizeWindow')},
-		addSong: () => 
+		addSong: async () => 
     {
       let files = sendSync('addSong')
-      Settings_Handler.add(files)
+      await Settings_Handler.add(files)
+      return Settings_Handler.get_ids()
     }
   },
   global_settings,
@@ -40,7 +41,10 @@ contextBridge.exposeInMainWorld('electron',
   //_sortSettings: require()
 })
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', () => 
+{
+  Settings_Handler.full_load()
+  /*
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)
     if (element) element.innerText = text
@@ -49,4 +53,5 @@ window.addEventListener('DOMContentLoaded', () => {
   for (const type of ['chrome', 'node', 'electron']) {
     replaceText(`${type}-version`, process.versions[type])
   }
+  */
 })

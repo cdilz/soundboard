@@ -27,8 +27,9 @@ document.addEventListener('DOMContentLoaded', () =>
 		}
 	})
 
-	add.addEventListener('click', e =>
+	add.addEventListener('click', async e =>
 	{
-		electron.window.addSong()
+		let ids = await electron.window.addSong()
+		alert(ids)
 	})
 })
