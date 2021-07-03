@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () =>
 	{
 		electron.window.minimize()
 	})
+	
 	close.addEventListener('click',() => 
 	{
 		electron.window.close()

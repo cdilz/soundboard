@@ -4,7 +4,6 @@ const {ipcRenderer, contextBridge} = require('electron')
 let SVG = require('./main/svg.js')
 let global_settings = require('./main/global_settings.js')
 let Settings_Handler = require('./main/settings/settings_handler.js')
-const { settings } = require('./main/settings/settings_handler.js')
 
 function send(channel, ...args)
 {
@@ -38,6 +37,8 @@ contextBridge.exposeInMainWorld('electron',
   {
     //get: (id) => {return Settings_Handler.get(id)}
     save: (id) => {Settings_Handler.save(id)}
+
+    ,get_ids: () => {return Settings_Handler.get_ids()}
 
     ,toggle_ctrl: (id) => {Settings_Handler.toggle_ctrl(id)}
     ,get_ctrl: (id) => {Settings_Handler.get_ctrl(id)}
@@ -78,6 +79,7 @@ contextBridge.exposeInMainWorld('electron',
 window.addEventListener('DOMContentLoaded', () => 
 {
   Settings_Handler.full_load()
+
   /*
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)

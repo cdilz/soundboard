@@ -74,7 +74,6 @@ class Settings_Event
 			parts.audio.paused ? parts.audio.play() : parts.audio.pause()
 		}
 
-
 		parts.play.addEventListener('click', click_event.bind(parts), false)
 	}
 

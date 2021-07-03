@@ -29,6 +29,7 @@ class Settings_Handler
 	{
 		try
 		{
+			this.settings = []
 			let files = fs.readdirSync(audio_path)
 			for(let i = 0; i < files.length; i++)
 			{
