@@ -69,7 +69,7 @@ class Settings_File
 	{
 		try
 		{
-			let settings_file = path.join(settings_path, this.fileName + '.json')
+			let settings_file = path.join(settings_path, this.file_name + '.json')
 			fs.unlinkSync(settings_file)
 			return this
 		}

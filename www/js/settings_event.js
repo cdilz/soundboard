@@ -43,7 +43,9 @@ class Settings_Event
 		this.grips(parts)
 		this.audio(parts)
 		this.seek_bar(parts)
+		this.volume(parts)
 		this.title(parts)
+		this.delete(parts)
 	}
 
 	static is_waiting_for_input(parts)
@@ -53,12 +55,12 @@ class Settings_Event
 
 	static min_time(parts)
 	{
-		return parts.settings.constrain.min * parts.audio.duration
+		return electron.audio.get_grip_min(parts.id) * parts.audio.duration
 	}
 
 	static max_time(parts)
 	{
-		return parts.settings.constrain.max * parts.audio.duration
+		return electron.audio.get_grip_max(parts.id) * parts.audio.duration
 	}
 
 	static current_time(parts)
@@ -68,56 +70,51 @@ class Settings_Event
 
 	static play_button(parts)
 	{
-		let click_event = (e) =>
+		let click_event = (parts) =>
 		{
-			let parts = this
 			parts.audio.paused ? parts.audio.play() : parts.audio.pause()
 		}
 
-		parts.play.addEventListener('click', click_event.bind(parts), false)
+		parts.play.addEventListener('click', click_event.bind(undefined,parts), false)
 	}
 
 	static hold_button(parts)
 	{
-		let click_event = (e) =>
+		let click_event = (parts) =>
 		{
-			let parts = this
-			electron.audio.toggle_hold(this.id)
+			electron.audio.toggle_hold(parts.id)
 			parts.hold.classList.toggle('unlit')
 			parts.hold.classList.toggle('lit')
-			electron.audio.save(this.id)
+			electron.audio.save(parts.id)
 		}
 
-		parts.hold.addEventListener('click', click_event.bind(parts), false)
+		parts.hold.addEventListener('click', click_event.bind(undefined, parts), false)
 	}
 
 	static restart_button(parts)
 	{
-		let click_event = (e) =>
+		let click_event = (parts) =>
 		{
-			let parts = this
-			electron.audio.toggle_restart(this.id)
+			electron.audio.toggle_restart(parts.id)
 			parts.restart.classList.toggle('unlit')
 			parts.restart.classList.toggle('lit')
-			electron.audio.save(this.id)
+			electron.audio.save(parts.id)
 		}
 
-		parts.restart.addEventListener('click', click_event.bind(parts), false)
+		parts.restart.addEventListener('click', click_event.bind(undefined, parts), false)
 	}
 
 	static loop_button(parts)
 	{
-		
-		let click_event = (e) =>
+		let click_event = (parts) =>
 		{
-			let parts = this
-			electron.audio.toggle_loop(this.id)
+			electron.audio.toggle_loop(parts.id)
 			parts.loop.classList.toggle('unlit')
 			parts.loop.classList.toggle('lit')
-			electron.audio.save(this.id)
+			electron.audio.save(parts.id)
 		}
 
-		parts.loop.addEventListener('click', click_event.bind(parts), false)
+		parts.loop.addEventListener('click', click_event.bind(undefined, parts), false)
 	}
 
 	static light_keys(parts)
@@ -154,13 +151,12 @@ class Settings_Event
 
 	static key_button(parts)
 	{
-		let click_event = (e) =>
+		let click_event = (parts) =>
 		{
-			let parts = this
 			parts.key.classList.toggle('waitingForInput')
 		}
 
-		parts.key.addEventListener('click', click_event.bind(parts), false)
+		parts.key.addEventListener('click', click_event.bind(undefined, parts), false)
 	}
 
 	static grip_set_position(e, grip, parts)
@@ -175,17 +171,26 @@ class Settings_Event
 		let boundLeft = seekBar.getClientRects()[0].left
 		let boundRight = seekBar.getClientRects()[0].right
 
-		let setValue = (currentX - boundLeft) / (boundRight - boundLeft)
+		let new_value = (currentX - boundLeft) / (boundRight - boundLeft)
 		let isMin = grip == parts.seekMinGrip
 		let isMax = grip == parts.seekMaxGrip
 
 		if(isMin)
 		{
-			electron.audio.set_grip_min(id, setValue)
+			min_grip = new_value
 		}
 		else if(isMax)
 		{
-			electron.audio.set_grip_max(id, setValue)
+			max_grip = new_value
+		}
+
+		if((min_grip >= max_grip && isMin) || min_grip < 0)
+		{
+			min_grip = 0
+		}
+		else if((min_grip >= max_grip && isMin) || max_grip > 1)
+		{
+			max_grip = 1
 		}
 
 		if(seekBar.value < min_grip)
@@ -197,27 +202,6 @@ class Settings_Event
 			seekBar.value = max_grip
 		}
 
-		if(min_grip >= max_grip)
-		{
-			if(isMin)
-			{
-				electron.audio.set_grip_min(id, 0)
-			}
-			else if(isMax)
-			{
-				electron.audio.set_grip_max(id, 1)
-			}
-		}		
-
-		if(min_grip < 0)
-		{
-			electron.audio.set_grip_min(id, 0)
-		}
-		else if(max_grip > 1)
-		{
-			electron.audio.set_grip_max(id, 1)
-		}
-
 		let seekBarWidth = parts.seekBar.offsetWidth
 
 		let minWidth = (min_grip * seekBarWidth)
@@ -227,6 +211,9 @@ class Settings_Event
 		parts.seekMinBox.style.width = `${minWidth}px`
 		parts.seekMaxBox.style.marginLeft = maxMargin + 'px'
 		parts.seekMaxBox.style.width = `${maxWidth}px`
+
+		electron.audio.set_grip_min(id, min_grip)
+		electron.audio.set_grip_max(id, max_grip)
 
 		electron.audio.save(id)
 	}
@@ -234,109 +221,109 @@ class Settings_Event
 	static grip_resize(parts)
 	{
 		let id = parts.id
-		let min_grip = electron.audio.get_grip_min(id)
-		let max_grip = electron.audio.get_grip_max(id)
+		let container = parts.player
+		// Check if the player is still on the board to prevent a potential memory leak.
+		if(container.parentElement != null)
+		{
+			let min_grip = electron.audio.get_grip_min(id)
+			let max_grip = electron.audio.get_grip_max(id)
 
-		let seekBarWidth = parts.seekBar.offsetWidth
+			let seekBarWidth = parts.seekBar.offsetWidth
 
-		//if(this.options.constrain.min < 0) {this.options.constrain.min = 0}
-		//else if(this.options.constrain.min > 1) {this.options.constrain.min = 1}
+			//if(this.options.constrain.min < 0) {this.options.constrain.min = 0}
+			//else if(this.options.constrain.min > 1) {this.options.constrain.min = 1}
 
-		let minWidth = (min_grip * seekBarWidth)
-		let maxMargin = (max_grip * seekBarWidth)
-		let maxWidth = (seekBarWidth - maxMargin)
+			let minWidth = (min_grip * seekBarWidth)
+			let maxMargin = (max_grip * seekBarWidth)
+			let maxWidth = (seekBarWidth - maxMargin)
 
-		parts.seekMinBox.style.width = `${minWidth}px`
-		parts.seekMaxBox.style.marginLeft = maxMargin + 'px'
-		parts.seekMaxBox.style.width = `${maxWidth}px`
+			parts.seekMinBox.style.width = `${minWidth}px`
+			parts.seekMaxBox.style.marginLeft = maxMargin + 'px'
+			parts.seekMaxBox.style.width = `${maxWidth}px`
 
-		setInterval(this.grip_resize.bind(this, parts),global_settings.grip_interval)
+			setTimeout(Settings_Event.grip_resize,global_settings.grip_interval, parts)
+		}
 	}
 
 	static grips(parts)
 	{
-		let min_sliding_event = (e) => {Settings_Event.gripSetPosition(e, this.seekMinGrip, this)}
-		let max_sliding_event = (e) => {Settings_Event.gripSetPosition(e, this.seekMaxGrip, this)}
+		let min_sliding_event = (e) => {Settings_Event.grip_set_position(e, Settings_Event.seekMinGrip, parts)}
+		let max_sliding_event = (e) => {Settings_Event.grip_set_position(e, Settings_Event.seekMaxGrip, parts)}
 
-		let min_begin_slide_event = (e) =>
+		let min_begin_slide_event = (parts, e) =>
 		{
-			let parts = this
-			parts.seekMinGrip.onpointermove = min_sliding_event.bind(this)
+			parts.seekMinGrip.onpointermove = min_sliding_event.bind(undefined, parts)
 			parts.seekMinGrip.setPointerCapture(e.pointerId)
-			gripSetPosition(e, parts.seekMinGrip)
+			Settings_Event.grip_set_position(e, parts.seekMinGrip, parts)
 	
 			parts.seekMinGrip.style.cursor = 'ew-resize'
 			document.querySelector('html').style.cursor = 'ew-resize'
 		}
 
-		let max_begin_slide_event = (e) =>
+		let max_begin_slide_event = (parts, e) =>
 		{
-			let parts = this
-			parts.seekMaxGrip.onpointermove = max_sliding_event.bind(this)
+			parts.seekMaxGrip.onpointermove = max_sliding_event.bind(undefined, parts)
 			parts.seekMaxGrip.setPointerCapture(e.pointerId)
-			gripSetPosition(e, parts.seekMaxGrip)
+			Settings_Event.grip_set_position(e, parts.seekMaxGrip, parts)
 	
 			parts.seekMaxGrip.style.cursor = 'ew-resize'
 			document.querySelector('html').style.cursor = 'ew-resize'
 		}
 
-		let min_end_slide_event = (e) =>
+		let min_end_slide_event = (parts, e) =>
 		{
-			let parts = this
 			parts.seekMinGrip.onpointermove = null
 			parts.seekMinGrip.releasePointerCapture(e.pointerId)
 
 			parts.seekMinGrip.style.cursor = ''
 			document.querySelector('html').style.cursor = ''
 			
-			Settings_Event.grip_set_position(e, parts.seekMinGrip)
+			Settings_Event.grip_set_position(e, parts.seekMinGrip, parts)
 		}
 
-		let max_end_slide_event = (e) =>
+		let max_end_slide_event = (parts, e) =>
 		{
-			let parts = this
 			parts.seekMaxGrip.onpointermove = null
 			parts.seekMaxGrip.releasePointerCapture(e.pointerId)
 
 			parts.seekMaxGrip.style.cursor = ''
 			document.querySelector('html').style.cursor = ''
 			
-			Settings_Event.grip_set_position(e, parts.seekMaxGrip)
+			Settings_Event.grip_set_position(e, parts.seekMaxGrip, parts)
 		}
 
 		parts.seekMinGrip.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
-		parts.seekMinGrip.addEventListener('pointerdown', min_begin_slide_event.bind(parts), false)
-		parts.seekMinGrip.addEventListener('pointerup', min_end_slide_event.bind(parts), false)
+		parts.seekMinGrip.addEventListener('pointerdown', min_begin_slide_event.bind(undefined, parts), false)
+		parts.seekMinGrip.addEventListener('pointerup', min_end_slide_event.bind(undefined, parts), false)
 
 		parts.seekMaxGrip.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
-		parts.seekMaxGrip.addEventListener('pointerdown', max_begin_slide_event.bind(parts), false)
-		parts.seekMaxGrip.addEventListener('pointerup', max_end_slide_event.bind(parts), false)
+		parts.seekMaxGrip.addEventListener('pointerdown', max_begin_slide_event.bind(undefined, parts), false)
+		parts.seekMaxGrip.addEventListener('pointerup', max_end_slide_event.bind(undefined, parts), false)
 
-		this.grip_resize(parts)
+		Settings_Event.grip_resize(parts)
 	}
 
 	static audio(parts)
 	{
-		let play_event = (e) =>
+		let play_event = (parts) =>
 		{
-			this.play.innerHTML = SVG.sound.pause
+			parts.play.innerHTML = SVG.sound.pause
 		}
 
-		let pause_event = (e) =>
+		let pause_event = (parts) =>
 		{
-			let parts = this
 			parts.play.innerHTML = SVG.sound.play
 
 			if(electron.audio.get_restart(parts.id))
 			{
-				parts.audio.currentTime = Settings_Event.minTime(parts)
+				parts.audio.currentTime = Settings_Event.min_time(parts)
 			}
 		}
 
-		let time_update_event = (e) =>
+		let time_update_event = (parts) =>
 		{
-			let parts = this
 			let audio = parts.audio
+			let seek_bar = parts.seekBar
 			let min_time = Settings_Event.min_time(parts)
 			let max_time = Settings_Event.max_time(parts)
 			let current_time = audio.currentTime
@@ -357,22 +344,24 @@ class Settings_Event
 					audio.pause()
 				}
 			}
-
+			seek_bar.value = audio.currentTime / audio.duration
 		}
 
-		let ended_event = (e) =>
+		let ended_event = (parts) =>
 		{
-			let parts = this
-			parts.audio.currentTime = min_time
+			let audio = parts.audio
+			let min_time = Settings_Event.min_time(parts)
+			audio.currentTime = min_time
 			if(electron.audio.get_loop(parts.id))
 			{
 				parts.audio.play()
 			}
 		}
-		parts.audio.addEventListener('play', play_event.bind(parts), false)
-		parts.audio.addEventListener('pause', pause_event.bind(parts), false)
-		parts.audio.addEventListener('timeupdate', time_update_event.bind(parts), false)
-		parts.audio.addEventListener('ended', ended_event.bind(parts), false)
+
+		parts.audio.addEventListener('play', play_event.bind(undefined, parts), false)
+		parts.audio.addEventListener('pause', pause_event.bind(undefined, parts), false)
+		parts.audio.addEventListener('timeupdate', time_update_event.bind(undefined, parts), false)
+		parts.audio.addEventListener('ended', ended_event.bind(undefined, parts), false)
 	}
 
 	static seek_bar_set_position(e, parts)
@@ -405,23 +394,21 @@ class Settings_Event
 
 	static seek_bar(parts)
 	{
-		let click_event = (e) =>{Settings_Event.seek_bar_set_position(e, this)}
-		let sliding_event = (e) =>{Settings_Event.seek_bar_set_position(e, this)}
+		let click_event = (parts, e) =>{Settings_Event.seek_bar_set_position(e, parts)}
+		let sliding_event = (parts, e) =>{Settings_Event.seek_bar_set_position(e, parts)}
 
-		let begin_slide_event = (e) =>
+		let begin_slide_event = (parts, e) =>
 		{
-			let parts = this
-			parts.seekBar.onpointermove = sliding_event.bind(this)
+			parts.seekBar.onpointermove = sliding_event.bind(undefined, parts)
 			parts.seekBar.setPointerCapture(e.pointerId)
-			Settings_Event.seekBarSetPosition(e)
+			Settings_Event.seek_bar_set_position(e, parts)
 	
 			parts.seekBar.style.cursor = 'ew-resize'
 			document.querySelector('html').style.cursor = 'ew-resize'
 		}
 
-		let end_slide_event = (e) =>
+		let end_slide_event = (parts, e) =>
 		{
-			let parts = this
 			parts.seekBar.onpointermove = null
 			parts.seekBar.releasePointerCapture(e.pointerId)
 	
@@ -432,9 +419,9 @@ class Settings_Event
 		}
 
 		parts.seekBar.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
-		parts.seekBar.addEventListener('pointerdown', begin_slide_event.bind(this), false)
-		parts.seekBar.addEventListener('pointerup', end_slide_event.bind(this), false)
-		parts.seekBar.addEventListener('click', click_event.bind(this), false)
+		parts.seekBar.addEventListener('pointerdown', begin_slide_event.bind(undefined, parts), false)
+		parts.seekBar.addEventListener('pointerup', end_slide_event.bind(undefined, parts), false)
+		parts.seekBar.addEventListener('click', click_event.bind(undefined, parts), false)
 	}
 
 	static volume_bar_set_position(e, parts)
@@ -460,35 +447,32 @@ class Settings_Event
 
 	static volume(parts)
 	{	
-		let volume_click_event = (e) => {Settings_Event.volumeBarSetPosition(e, this)}
-		let slide_event = (e) => {Settings_Event.volumeBarSetPosition(e, this)}
+		let volume_click_event = (parts, e) => {Settings_Event.volume_bar_set_position(e, parts)}
+		let slide_event = (parts, e) => {Settings_Event.volume_bar_set_position(e, parts)}
 	
-		let begin_slide_event = (e) =>
+		let begin_slide_event = (parts, e) =>
 		{
-			let parts = this
-			parts.volumeBar.onpointermove = slide_event.bind(this)
+			parts.volumeBar.onpointermove = slide_event.bind(undefined, parts)
 			parts.volumeBar.setPointerCapture(e.pointerId)
-			Settings_Event.volumeBarSetPosition(e)
+			Settings_Event.volume_bar_set_position(e, parts)
 	
-			this.parts.volumeBar.style.cursor = 'ew-resize'
+			parts.volumeBar.style.cursor = 'ew-resize'
 			document.querySelector('html').style.cursor = 'ew-resize'
 		}	
 	
-		let end_slide_event = (e) =>
+		let end_slide_event = (parts, e) =>
 		{
-			let parts = this
 			parts.volumeBar.onpointermove = null
 			parts.volumeBar.releasePointerCapture(e.pointerId)
 	
 			parts.volumeBar.style.cursor = ''
 			document.querySelector('html').style.cursor = ''
 			
-			Settings_Event.volumeBarSetPosition(e)
+			Settings_Event.volume_bar_set_position(e, parts)
 		}
 
-		let mute_click_event = (e) =>
+		let mute_click_event = (parts) =>
 		{
-			let parts = this
 			let volumeButton = parts.volumeButton
 			let audio = parts.audio
 	
@@ -505,21 +489,21 @@ class Settings_Event
 			}
 		}
 
-		parts.volumeBar.addEventListener('click', volume_click_event.bind(parts), false)
+		parts.volumeBar.addEventListener('click', volume_click_event.bind(undefined, parts), false)
 		parts.volumeBar.addEventListener('dragstart', (e) => {e.preventDefault()}, false)
-		parts.volumeBar.addEventListener('pointerdown', begin_slide_event.bind(parts), false)
-		parts.volumeBar.addEventListener('pointerup', end_slide_event.bind(parts), false)
+		parts.volumeBar.addEventListener('pointerdown', begin_slide_event.bind(undefined, parts), false)
+		parts.volumeBar.addEventListener('pointerup', end_slide_event.bind(undefined, parts), false)
 
-		parts.volumeButton.addEventListener('click', mute_click_event.bind(parts), false)
+		parts.volumeButton.addEventListener('click', mute_click_event.bind(undefined, parts), false)
 	}
 
 	static title_duplicate(parts)
 	{
 		let title_outer = parts.title
-		let title_inner = parts.title_inner
-		let dupes = title_outer.querySelectorAll('.soundeTitleInnerDupe')
+		let title_inner = parts.titleInner
+		let dupes = title_outer.querySelectorAll('.soundTitleInnerDupe')
 		// The outer title's content goes outside its bounding box.
-		if(title_outer.clientWidth < title_outer.scrollWidth)
+		if(title_outer.clientWidth < title_outer.children[0].clientWidth)
 		{
 			if(dupes.length == 0)
 			{
@@ -542,14 +526,14 @@ class Settings_Event
 
 	static title(parts)
 	{
-		this.title_duplicate(parts)
+		Settings_Event.title_duplicate(parts)
 		let container = parts.player
 		// Check if the player is still on the board to prevent a potential memory leak.
-		if(!container.parentElement == null)
+		if(container.parentElement != null)
 		{
 			let title_outer = parts.title
 			// Get all duplicate titles then marquee if there are any.
-			let dupes = title_outer.querySelectorAll('.soundeTitleInnerDupe')
+			let dupes = title_outer.querySelectorAll('.soundTitleInnerDupe')
 			if(dupes.length > 0)
 			{
 				let scroll_settings = marquee_settings.scroll
@@ -558,7 +542,11 @@ class Settings_Event
 				let child_style = getComputedStyle(child)
 
 				// Scroll the outer title using what the settings state.
-				title_outer.scrollBy({left: scroll_settings.left, top: scroll_settings.top, behavior: scroll_settings.behavior})
+
+				// ScrollBy, while preferred, is nonfunctioning for some unknown reason
+				//title_outer.scrollBy({left: scroll_settings.left, behavior: scroll_settings.behavior})
+				
+				title_outer.scrollLeft += scroll_settings.left
 
 				// Get how far the title is scrolled left.
 				let title_x = title_outer.scrollLeft
@@ -576,15 +564,15 @@ class Settings_Event
 			}
 
 			// Run this function again after interval settings.
-			setTimeout(this.title.bind(this, parts), marquee_settings.scroll.interval)
+			setTimeout(Settings_Event.title, marquee_settings.scroll.interval, parts)
 		}		
 	}
 
 	static delete(parts)
 	{
-		let click_event = (e) =>
+		let click_event = (parts) =>
 		{
-			let id = this.id
+			let id = parts.id
 			let file_name = electron.audio.get_file_name(id)
 			if(window.confirm(`Are you sure you'd like to delete ${file_name}?`))
 			{
@@ -592,6 +580,6 @@ class Settings_Event
 			}
 		}
 
-		parts.delete.addEventListener('click', click_event.bind(parts), false)
+		parts.delete.addEventListener('click', click_event.bind(undefined, parts), false)
 	}
 }

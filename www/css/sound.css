@@ -252,6 +252,7 @@ audio{display: none;}
 
 .seekClampBox
 {
+	z-index: 1000;
 	min-width: 4px;
 	height: var(--sound-inner-button-size);
 	display: flex;
@@ -261,16 +262,20 @@ audio{display: none;}
 
 .seekMinBox
 {
+	width: 0px;
 	justify-content: right;
 }
 
 .seekMaxBox
 {
+	width: 0px;
 	justify-content: left;
 }
 
 .seekClampGrip
 {
+	width: 0px;
+	z-index: 1000;
 	min-width: 4px;
 	max-width: 4px;
 	height: 1.90rem;

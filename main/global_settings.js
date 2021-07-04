@@ -13,13 +13,13 @@ module.exports =
 {
 	settings_path,
 	audio_path,
-	grip_interval: 10,
+	grip_interval: 100,
 	marquee:
 	{
 		scroll:
 		{
 			// How often the marquee will scroll in milliseconds
-			interval: 10,
+			interval: 50,
 			// How many pixels left to scroll
 			left: 1,
 			// How many pixels up to scroll?

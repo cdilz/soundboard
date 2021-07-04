@@ -222,11 +222,15 @@ class Settings_Handler
 	 * 
 	 * @param {String} id - ID of settings file to delete.
 	 */
-	static delete(id)
+	static async delete(id)
 	{
 		try
 		{
-			this.get(id).delete()
+			let i = this.get_index(id)
+			let setting = this.get(id)
+			let audio_file = setting.file_name
+			fs.unlinkSync(path.join(audio_path, audio_file))
+			await setting.delete()
 			this.settings.splice(i, 1)
 			this.fill_display()
 		}
@@ -262,8 +266,8 @@ class Settings_Handler
 		let setting = this.get(id)
 		setting.hold = !setting.hold
 	}
-	static get_hold(id){return this.get(id).setting.hold}
-	static set_hold(id, value){this.get(id).setting.hold = value}
+	static get_hold(id){return this.get(id).hold}
+	static set_hold(id, value){this.get(id).hold = value}
 
 	/**
 	 * Toggle restart on setting with ID of id.
@@ -275,8 +279,8 @@ class Settings_Handler
 		let setting = this.get(id)
 		setting.restart = !setting.restart
 	}
-	static get_restart(id){return this.get(id).setting.restart}
-	static set_restart(id, value){this.get(id).setting.restart = value}
+	static get_restart(id){return this.get(id).restart}
+	static set_restart(id, value){this.get(id).restart = value}
 
 	/**
 	 * Toggle loop on setting with ID of id.
@@ -288,8 +292,8 @@ class Settings_Handler
 		let setting = this.get(id)
 		setting.loop = !setting.loop
 	}
-	static get_loop(id){return this.get(id).setting.loop}
-	static set_loop(id, value){this.get(id).setting.loop = value}
+	static get_loop(id){return this.get(id).loop}
+	static set_loop(id, value){this.get(id).loop = value}
 
 	static toggle_ctrl(id)
 	{
