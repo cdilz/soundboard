@@ -109,19 +109,19 @@ class Settings_UI
 
 	static shift(settings)
 	{
-		let light = this.light_class(settings.shift)
+		let light = this.light_class(settings.modifier.shift)
 		return `<div class='${light} controlLight shift' data-id='${settings.id}'>S</div>`
 	}
 
 	static ctrl(settings)
 	{
-		let light = this.light_class(settings.ctrl)
+		let light = this.light_class(settings.modifier.ctrl)
 		return `<div class='${light} controlLight ctrl' data-id='${settings.id}'>C</div>`
 	}
 
 	static alt(settings)
 	{
-		let light = this.light_class(settings.alt)
+		let light = this.light_class(settings.modifier.alt)
 		return `<div class='${light} controlLight alt' data-id='${settings.id}'>A</div>`
 	}
 

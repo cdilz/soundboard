@@ -42,19 +42,27 @@ contextBridge.exposeInMainWorld('electron',
 
     ,toggle_ctrl: (id) => {Settings_Handler.toggle_ctrl(id)}
     ,get_ctrl: (id) => {return Settings_Handler.get_ctrl(id)}
-    ,set_ctrl: (id, value) => {Settings_Handler.get_ctrl(id, value)}
+    ,set_ctrl: (id, value) => {Settings_Handler.set_ctrl(id, value)}
+
+    ,toggle_alt: (id) => {Settings_Handler.toggle_alt(id)}
+    ,get_alt: (id) => {return Settings_Handler.get_alt(id)}
+    ,set_alt: (id, value) => {Settings_Handler.set_alt(id, value)}
+
+    ,toggle_shift: (id) => {Settings_Handler.toggle_shift(id)}
+    ,get_shift: (id) => {return Settings_Handler.get_shift(id)}
+    ,set_shift: (id, value) => {Settings_Handler.set_shift(id, value)}
 
     ,toggle_hold: (id) => {Settings_Handler.toggle_hold(id)}
     ,get_hold: (id) => {return Settings_Handler.get_hold(id)}
-    ,set_hold: (id, value) => {Settings_Handler.get_hold(id, value)}
+    ,set_hold: (id, value) => {Settings_Handler.set_hold(id, value)}
 
     ,toggle_restart: (id) => {Settings_Handler.toggle_restart(id)}
     ,get_restart: (id) => {return Settings_Handler.get_restart(id)}
-    ,set_restart: (id, value) => {Settings_Handler.get_restart(id, value)}
+    ,set_restart: (id, value) => {Settings_Handler.set_restart(id, value)}
 
     ,toggle_loop: (id) => {Settings_Handler.toggle_loop(id)}
     ,get_loop: (id) => {return Settings_Handler.get_loop(id)}
-    ,set_loop: (id, value) => {Settings_Handler.get_loop(id, value)}
+    ,set_loop: (id, value) => {Settings_Handler.set_loop(id, value)}
 
     ,get_key: (id) => {return Settings_Handler.get_key(id)}
     ,set_key: (id, value) => {Settings_Handler.set_key(id, value)}

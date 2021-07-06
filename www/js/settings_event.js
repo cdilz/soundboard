@@ -5,7 +5,9 @@ const marquee_settings = global_settings.marquee
 
 class Settings_Event
 {
-	static set_all(id)
+	static key_dictionary = {}
+
+	static get_parts(id)
 	{
 		let sound_container = document.querySelector(`#${id}`)
 		let parts =
@@ -35,17 +37,57 @@ class Settings_Event
 			,volumeBar: sound_container.querySelector('.volumeBar')
 		}
 
-		this.play_button(parts)
-		this.hold_button(parts)
-		this.restart_button(parts)
-		this.loop_button(parts)
-		this.key_button(parts)
-		this.grips(parts)
-		this.audio(parts)
-		this.seek_bar(parts)
-		this.volume(parts)
-		this.title(parts)
-		this.delete(parts)
+		return parts
+	}
+
+	static set_all(id)
+	{
+		let parts = Settings_Event.get_parts(id)
+
+		Settings_Event.play_button(parts)
+		Settings_Event.hold_button(parts)
+		Settings_Event.restart_button(parts)
+		Settings_Event.loop_button(parts)
+		Settings_Event.key_button(parts)
+		Settings_Event.grips(parts)
+		Settings_Event.audio(parts)
+		Settings_Event.seek_bar(parts)
+		Settings_Event.volume(parts)
+		Settings_Event.title(parts)
+		Settings_Event.delete(parts)
+	}
+
+	static light_keys(parts, overwrite = {})
+	{
+
+		let ctrl = overwrite.ctrl ?? electron.audio.get_ctrl(parts.id)
+		let alt = overwrite.alt ?? electron.audio.get_alt(parts.id)
+		let shift = overwrite.shift ?? electron.audio.get_shift(parts.id)
+
+		parts.ctrl.classList.remove('unlit', 'lit')
+		parts.alt.classList.remove('unlit', 'lit')
+		parts.shift.classList.remove('unlit', 'lit')
+	
+		// If the ctrl key is pressed light it up, otherwise unlight it
+		parts.ctrl.classList.add(ctrl ? 'lit' : 'unlit')
+	
+		// If the alt key is pressed light it up, otherwise unlight it
+		parts.alt.classList.add(alt ? 'lit' : 'unlit')
+	
+		// If the shift key is pressed light it up, otherwise unlight it
+		parts.shift.classList.add(shift ? 'lit' : 'unlit')
+	}
+
+	static clear_key(parts)
+	{
+		electron.audio.set_ctrl(parts.id, false)
+		electron.audio.set_shift(parts.id, false)
+		electron.audio.set_alt(parts.id, false)
+		Settings_Event.light_keys(parts)
+		electron.audio.set_key(parts.id, null)
+		parts.key.innerHTML = '?'
+		parts.key.classList.remove('set')
+		electron.audio.save(parts.id)
 	}
 
 	static is_waiting_for_input(parts)
@@ -115,38 +157,6 @@ class Settings_Event
 		}
 
 		parts.loop.addEventListener('click', click_event.bind(undefined, parts), false)
-	}
-
-	static light_keys(parts)
-	{
-		let ctrl = electron.audio.get_ctrl(parts.id)
-		let shift = electron.audio.get_shift(parts.id)
-		let alt = electron.audio.get_alt(parts.id)
-
-		parts.ctrl.classList.remove('unlit', 'lit')
-		parts.shift.classList.remove('unlit', 'lit')
-		parts.alt.classList.remove('unlit', 'lit')
-	
-		// If the ctrl key is pressed light it up, otherwise unlight it
-		parts.ctrl.classList.add(ctrl ? 'lit' : 'unlit')
-	
-		// If the shift key is pressed light it up, otherwise unlight it
-		parts.shift.classList.add(shift ? 'lit' : 'unlit')
-	
-		// If the alt key is pressed light it up, otherwise unlight it
-		parts.alt.classList.add(alt ? 'lit' : 'unlit')
-	}
-
-	static clear_key(parts)
-	{
-		electron.audio.set_ctrl(parts.id, false)
-		electron.audio.set_shift(parts.id, false)
-		electron.audio.set_alt(parts.id, false)
-		Settings_Event.light_keys(parts)
-		electron.audio.set_key(parts.id, null)
-		parts.key.innerHTML = '?'
-		parts.key.classList.remove('set')
-		electron.audio.save(parts.id)
 	}
 
 	static key_button(parts)
@@ -495,6 +505,8 @@ class Settings_Event
 		parts.volumeBar.addEventListener('pointerup', end_slide_event.bind(undefined, parts), false)
 
 		parts.volumeButton.addEventListener('click', mute_click_event.bind(undefined, parts), false)
+
+		parts.audio.volume = electron.audio.get_volume(parts.id)
 	}
 
 	static title_duplicate(parts)
@@ -583,3 +595,131 @@ class Settings_Event
 		parts.delete.addEventListener('click', click_event.bind(undefined, parts), false)
 	}
 }
+
+document.addEventListener('keydown', (e) =>
+	{
+		if(!e.repeat)
+		{
+			let waiting_for_input = document.querySelectorAll('.waitingForInput')
+			if(waiting_for_input.length > 0)
+			{
+				if(e.key != 'Backspace' && e.key != 'Delete' && e.key != 'Escape')
+				{
+					for(let i = 0; i < waiting_for_input.length; i++)
+					{
+						let id = waiting_for_input[i].dataset.id
+						let parts = Settings_Event.get_parts(id)
+						// Light up the settings keys and overwrite the defaults with our new potentials
+						Settings_Event.light_keys(parts, Key_Press)
+					}
+				}
+			}
+			else
+			{
+				let ids = electron.audio.get_ids()
+				for(let i = 0; i < ids.length; i++)
+				{
+					let id = ids[i]
+					let key = electron.audio.get_key(id)
+					let ctrl = electron.audio.get_ctrl(id)
+					let alt = electron.audio.get_alt(id)
+					let shift = electron.audio.get_shift(id)
+
+					if(Key_Press.is_pressed(key, ctrl, alt, shift))
+					{
+						let parts = Settings_Event.get_parts(id)
+						parts.play.click()
+					}
+				}
+			}
+		}
+	})
+
+document.addEventListener('keyup', (e) =>
+	{
+		// Don't repeat if the key is being held
+		if(!e.repeat)
+		{
+			let waiting_for_input = document.querySelectorAll('.waitingForInput')
+			// If there is audio waiting for input we don't want to accidentally pause anything
+			if(waiting_for_input.length > 0)
+			{
+				// We have a few options to clear a key or cancel input
+				let cancel = e.key == 'Backspace' || e.key == 'Delete' || e.key == 'Escape'
+				let clear = e.key == 'Backspace' || e.key == 'Delete'
+
+				// If we're clearing the key run the clear function
+				if(clear)
+				{
+					for(let i = 0; i < waiting_for_input.length; i++)
+					{
+						let id = waiting_for_input[i].dataset.id
+						let parts = Settings_Event.get_parts(id)
+						
+						Settings_Event.clear_key(parts)
+					}
+				}
+
+				// If we're cancelling input just click the key entry button again
+				if(cancel)
+				{
+					for(let i = 0; i < waiting_for_input.length; i++)
+					{
+						let id = waiting_for_input[i].dataset.id
+						let parts = Settings_Event.get_parts(id)
+						parts.key.click()
+						Settings_Event.light_keys(parts)
+					}
+				}
+				else
+				{
+					for(let i = 0; i < waiting_for_input.length; i++)
+					{
+						let id = waiting_for_input[i].dataset.id
+						let parts = Settings_Event.get_parts(id)
+
+						// Adjust keys for the ones that are lifted				
+						Settings_Event.light_keys(parts, Key_Press)
+
+						// If lifting a non-modifier key then save it
+						if(!Key_Press.is_key_pressed && Key_Press.latest != '')
+						{
+							electron.audio.set_key(id, Key_Press.latest)
+							electron.audio.set_ctrl(id, Key_Press.ctrl)
+							electron.audio.set_alt(id, Key_Press.alt)
+							electron.audio.set_shift(id, Key_Press.shift)
+							electron.audio.save(id)
+
+							parts.key.innerHTML = Key_Press.latest
+							parts.key.classList.add('set')
+							parts.key.click()
+							Key_Press.clear()
+						}
+					}
+				}
+			}
+			else
+			{
+				let ids = electron.audio.get_ids()
+				for(let i = 0; i < ids.length; i++)
+				{
+					let id = ids[i]
+					let parts = Settings_Event.get_parts(id)
+					let key = electron.audio.get_key(id)
+					let ctrl = electron.audio.get_ctrl(id)
+					let alt = electron.audio.get_alt(id)
+					let shift = electron.audio.get_shift(id)
+					let hold = electron.audio.get_hold(id)
+	
+					// If the key not pressed then pause the audio if it's a hold
+					if(!Key_Press.is_pressed(key, ctrl, alt, shift) && hold)
+					{
+						if(!parts.audio.paused)
+						{
+							parts.player.querySelector('.playButton').click()
+						}
+					}
+				}
+			}
+		}
+	})
