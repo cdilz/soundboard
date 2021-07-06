@@ -247,8 +247,8 @@ class Settings_Event
 
 	static grips(parts)
 	{
-		let min_sliding_event = (e) => {Settings_Event.grip_set_position(e, Settings_Event.seekMinGrip, parts)}
-		let max_sliding_event = (e) => {Settings_Event.grip_set_position(e, Settings_Event.seekMaxGrip, parts)}
+		let min_sliding_event = (parts, e) => {Settings_Event.grip_set_position(e, parts.seekMinGrip, parts)}
+		let max_sliding_event = (parts, e) => {Settings_Event.grip_set_position(e, parts.seekMaxGrip, parts)}
 
 		let min_begin_slide_event = (parts, e) =>
 		{
