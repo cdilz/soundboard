@@ -27,7 +27,10 @@ contextBridge.exposeInMainWorld('electron',
 		addSong: async () => 
     {
       let files = sendSync('addSong')
-      await Settings_Handler.add(files)
+      if(typeof files != typeof undefined)
+      {
+        await Settings_Handler.add(files)
+      }
       return Settings_Handler.get_ids()
     }
   },

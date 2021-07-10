@@ -37,7 +37,7 @@ function init(mainWindow)
 	{
 		try
 		{
-			let files = dialog.showOpenDialogSync(mainWindow,
+			event.returnValue = dialog.showOpenDialogSync(mainWindow,
 				{
 					 title: 'Add Songs'
 					,buttonLabel: 'Import'
@@ -48,11 +48,6 @@ function init(mainWindow)
 					]
 					,properties: ['multiSelections']
 				})
-	
-			if(!files.canceled)
-			{
-				event.returnValue = files
-			}
 		}
 		catch(e)
 		{
