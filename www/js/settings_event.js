@@ -582,13 +582,18 @@ class Settings_Event
 
 	static delete(parts)
 	{
-		let click_event = (parts) =>
+		let click_event = async (parts) =>
 		{
 			let id = parts.id
 			let file_name = electron.audio.get_file_name(id)
 			if(window.confirm(`Are you sure you'd like to delete ${file_name}?`))
 			{
-				electron.audio.delete(id)
+				await electron.audio.delete(id)
+				let ids = electron.audio.get_ids()
+				for(let i = 0; i < ids.length; i++)
+				{
+					Settings_Event.set_all(ids[i])
+				}
 			}
 		}
 

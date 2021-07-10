@@ -252,7 +252,6 @@ class Settings_Handler
 		{
 			let setting = this.settings[i]
 			display.innerHTML += setting.toHTML()
-			setting.set_events()
 		}
 	}
 

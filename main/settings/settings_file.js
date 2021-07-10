@@ -134,11 +134,6 @@ class Settings_File
 	{
 		return Settings_UI.generate_html(this)
 	}
-
-	set_events()
-	{
-		//Settings_Event.set_all(this)
-	}
 }
 
 module.exports = Settings_File
