@@ -1,6 +1,5 @@
 'use strict'
 
-const { settings } = require('cluster')
 const fs = require('fs')
 const path = require('path')
 
@@ -141,12 +140,24 @@ class Settings_Handler
 	 */
 	static async add(files)
 	{
+		let failures = []
 		try
 		{
 			for(let i = 0; i < files.length; i++)
 			{
-				await this.add_audio(files[i])
+				// If we fail to add the file, that's because it's already there.
+				if(!(await this.add_audio(files[i])))
+				{
+					failures.push(files[i])
+				}
 			}
+
+			let failures_concatenated = failures.join('\n')
+			if(failures.length > 0)
+			{
+				alert(`Some files already imported:\n${failures_concatenated}`)
+			}
+
 			await this.fill_display()
 		}
 		catch (e)
@@ -173,7 +184,7 @@ class Settings_Handler
 				fs.copyFileSync(file, audio_file_directory)
 			}
 			// If file is copied or already exists then we should load the settings and then save it to initialize it if it's new
-			this.add_setting(file_name)
+			return this.add_setting(file_name)
 		}
 		catch(e)
 		{
@@ -190,9 +201,21 @@ class Settings_Handler
 	{
 		try
 		{
+
+			// Check if this file is already imported, then return false if it is so we don't add it again.
+			for(let i = 0; i < this.settings.length; i++)
+			{
+				if(this.settings[i].file_name == file_name)
+				{
+					return false
+				}
+			}
+
 			let setting = await Settings_File.load(file_name)
 			setting.save()
 			this.settings.push(setting)
+
+			return true
 		}
 		catch(e)
 		{
