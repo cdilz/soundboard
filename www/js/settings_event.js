@@ -206,10 +206,12 @@ class Settings_Event
 		if(seekBar.value < min_grip)
 		{
 			seekBar.value = min_grip
+			parts.audio.currentTime = Settings_Event.min_time(parts)
 		}
 		else if(seekBar.value > max_grip)
 		{
 			seekBar.value = max_grip
+			parts.audio.currentTime = Settings_Event.max_time(parts)
 		}
 
 		let seekBarWidth = parts.seekBar.offsetWidth

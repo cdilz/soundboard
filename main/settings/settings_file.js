@@ -4,7 +4,6 @@ const crypto = require('crypto')
 const path = require('path')
 const fs = require('fs')
 const Settings_UI = require('./settings_ui.js')
-const Settings_Event = require('./settings_event.js')
 const global_settings = require('../global_settings.js')
 
 const settings_path = global_settings.settings_path
