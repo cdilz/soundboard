@@ -152,13 +152,9 @@ class Settings_Handler
 				}
 			}
 
-			let failures_concatenated = failures.join('\n')
-			if(failures.length > 0)
-			{
-				alert(`Some files already imported:\n${failures_concatenated}`)
-			}
-
 			await this.fill_display()
+
+			return failures
 		}
 		catch (e)
 		{

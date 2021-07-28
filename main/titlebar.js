@@ -1,5 +1,4 @@
 const {ipcMain, dialog} = require('electron')
-const Settings_Handler = require('./settings/settings_handler.js')
 
 function on(channel, func)
 {

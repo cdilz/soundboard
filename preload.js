@@ -29,8 +29,20 @@ contextBridge.exposeInMainWorld('electron',
       let files = sendSync('addSong')
       if(typeof files != typeof undefined)
       {
-        await Settings_Handler.add(files)
+        let failures = await Settings_Handler.add(files)
+      
+        if(failures.length > 0)
+        {
+          let failures_concatenated = failures.join('\n')
+          send('open_alert_window', {
+            title: "Already Imported",
+            type: "warning", 
+            message: "Some files have already been imported",
+            detail: failures_concatenated
+          })
+        }
       }
+
       return Settings_Handler.get_ids()
     }
   },

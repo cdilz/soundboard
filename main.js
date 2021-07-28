@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, ipcMain, dialog} = require('electron')
 const path = require('path')
 const titlebar = require('./main/titlebar.js')
 
@@ -79,4 +79,9 @@ app.on('web-contents-created', function (e, wc)
       wc.openDevTools()
     }
   })
+})
+
+ipcMain.on('open_alert_window', (e, alert_object) =>
+{
+  dialog.showMessageBox(mainWindow, alert_object)
 })
